@@ -1,0 +1,11 @@
+services:
+  quest-bot:
+    build: .
+    image: quest-bot:latest
+    container_name: QuestBot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs

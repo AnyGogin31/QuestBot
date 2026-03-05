@@ -1,0 +1,28 @@
+# Ignore IntelliJ IDEA project files
+.idea
+!.idea/copyright/
+
+# Ignore IntelliJ module files
+*.iml
+
+# Ignore VS Code settings
+.vscode
+
+# Ignore environment variables files
+.env
+
+# Ignore Python virtual environment
+.venv
+
+# Ignore database files
+*.db
+*.sqlite3
+
+# Ignore logging files
+*.log
+
+# Ignore Docker Compose configuration
+docker-compose.yml
+
+# Ignore macOS system files
+.DS_Store

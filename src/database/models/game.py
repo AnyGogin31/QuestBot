@@ -39,7 +39,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import (
     Mapped,
-    mapped_column
+    mapped_column,
+    relationship
 )
 
 from .base import BaseModel
@@ -104,4 +105,23 @@ class GameModel(BaseModel):
 
     finished_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime
+    )
+
+    author: Mapped["UserModel"] = relationship(
+        foreign_keys=[author_id],
+    )
+
+    teams: Mapped[List["TeamModel"]] = relationship(
+        back_populates="game",
+        cascade="all, delete-orphan"
+    )
+
+    actors: Mapped[List["ActorModel"]] = relationship(
+        back_populates="game",
+        cascade="all, delete-orphan"
+    )
+
+    stages: Mapped[List["StageModel"]] = relationship(
+        back_populates="game",
+        cascade="all, delete-orphan"
     )

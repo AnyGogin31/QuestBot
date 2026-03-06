@@ -16,10 +16,7 @@
 
 from datetime import datetime
 
-from typing import (
-    List,
-    Optional
-)
+from typing import Optional
 
 from uuid import (
     UUID,
@@ -35,7 +32,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import (
     Mapped,
-    mapped_column
+    mapped_column,
+    relationship
 )
 
 from .base import BaseModel
@@ -77,4 +75,16 @@ class StageModel(BaseModel):
 
     completed_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime
+    )
+
+    game: Mapped["GameModel"] = relationship(
+        back_populates="stages"
+    )
+
+    team: Mapped["TeamModel"] = relationship(
+        back_populates="stages"
+    )
+
+    actor: Mapped["ActorModel"] = relationship(
+        back_populates="stages"
     )

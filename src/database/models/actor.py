@@ -16,7 +16,10 @@
 
 from datetime import datetime
 
-from typing import Optional
+from typing import (
+    List,
+    Optional
+)
 
 from uuid import (
     UUID,
@@ -34,7 +37,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import (
     Mapped,
-    mapped_column
+    mapped_column,
+    relationship
 )
 
 from .base import BaseModel
@@ -80,4 +84,14 @@ class ActorModel(BaseModel):
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=func.now()
+    )
+
+    game: Mapped["GameModel"] = relationship(
+        back_populates="actors"
+    )
+
+    user: Mapped["UserModel"] = relationship()
+
+    stages: Mapped[List["StageModel"]] = relationship(
+        back_populates="actor"
     )

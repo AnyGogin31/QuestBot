@@ -14,10 +14,7 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-
-from .actor import ActorModel
-from .base import BaseModel
-from .game import GameModel
-from .stage import StageModel
-from .team import TeamModel
-from .user import UserModel
+from .actor_status import ActorStatus
+from .game_status import GameStatus
+from .stage_status import StageStatus
+from .team_status import TeamStatus

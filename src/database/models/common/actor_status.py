@@ -14,10 +14,11 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from enum import StrEnum, unique
 
-from .actor import ActorModel
-from .base import BaseModel
-from .game import GameModel
-from .stage import StageModel
-from .team import TeamModel
-from .user import UserModel
+
+@unique
+class ActorStatus(StrEnum):
+    FREE = 'free'
+    BUSY = 'busy'
+    WAITING_SCORE = 'waiting_score'

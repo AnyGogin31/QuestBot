@@ -14,12 +14,9 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from src.utils.alembic import configure_alembic
-
-
-def main():
-    configure_alembic()
-
-
-if __name__ == "__main__":
-    main()
+from .actor import ActorModel
+from .base import BaseModel
+from .game import GameModel
+from .stage import StageModel
+from .team import TeamModel
+from .user import UserModel

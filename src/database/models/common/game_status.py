@@ -14,12 +14,13 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from src.utils.alembic import configure_alembic
+from enum import StrEnum, unique
 
 
-def main():
-    configure_alembic()
-
-
-if __name__ == "__main__":
-    main()
+@unique
+class GameStatus(StrEnum):
+    CREATED = 'created'
+    PREPARED = 'prepared'
+    RUNNING = 'running'
+    FINISHED = 'finished'
+    CANCELLED = 'cancelled'

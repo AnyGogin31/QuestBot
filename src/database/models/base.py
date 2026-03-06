@@ -14,12 +14,8 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from src.utils.alembic import configure_alembic
+from sqlalchemy.orm import DeclarativeBase
 
 
-def main():
-    configure_alembic()
-
-
-if __name__ == "__main__":
-    main()
+class BaseModel(DeclarativeBase):
+    pass

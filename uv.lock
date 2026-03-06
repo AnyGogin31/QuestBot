@@ -444,6 +444,7 @@ dependencies = [
     { name = "aiosqlite" },
     { name = "alembic" },
     { name = "pydantic-settings" },
+    { name = "sqlalchemy" },
 ]
 
 [package.optional-dependencies]
@@ -457,6 +458,7 @@ requires-dist = [
     { name = "aiosqlite", specifier = ">=0.22.1" },
     { name = "alembic", specifier = ">=1.18.4" },
     { name = "pydantic-settings", specifier = ">=2.13.1" },
+    { name = "sqlalchemy", specifier = ">=2.0.48" },
     { name = "uvloop", marker = "extra == 'linux-only'", specifier = ">=0.22.1" },
 ]
 provides-extras = ["linux-only"]

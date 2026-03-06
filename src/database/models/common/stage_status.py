@@ -14,12 +14,12 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from src.utils.alembic import configure_alembic
+from enum import StrEnum, unique
 
 
-def main():
-    configure_alembic()
-
-
-if __name__ == "__main__":
-    main()
+@unique
+class StageStatus(StrEnum):
+    ASSIGNED = 'assigned'
+    IN_PROGRESS = 'in_progress'
+    COMPLETED = 'completed'
+    SKIPPED = 'skipped'

@@ -14,8 +14,65 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from . import BaseModel
+from datetime import datetime
+
+from uuid import (
+    UUID,
+    uuid7
+)
+
+from sqlalchemy import (
+    DateTime,
+    Enum,
+    ForeignKey,
+    func,
+    Integer,
+    String,
+    Uuid
+)
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column
+)
+
+from .base import BaseModel
+from .common import TeamStatus
 
 
 class TeamModel(BaseModel):
     __tablename__ = 'teams'
+
+    id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        primary_key=True,
+        default=uuid7
+    )
+
+    game_id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("games.id")
+    )
+
+    commander_id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id")
+    )
+
+    name: Mapped[str] = mapped_column(
+        String(255)
+    )
+
+    member_count: Mapped[int] = mapped_column(
+        Integer,
+        default=1
+    )
+
+    status: Mapped[TeamStatus] = mapped_column(
+        Enum(TeamStatus),
+        default=TeamStatus.IDLE
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=func.now()
+    )

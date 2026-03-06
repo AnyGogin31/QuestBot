@@ -14,16 +14,18 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from src.utils.alembic import configure_alembic
-from src.utils.logging import configure_logging
-from src.utils.uvloop import configure_uvloop
+from .logging import get_logger
 
 
-def main():
-    configure_logging()
-    configure_uvloop()
-    configure_alembic()
+_logger = get_logger(__name__)
 
 
-if __name__ == "__main__":
-    main()
+def configure_uvloop() -> None:
+    try:
+        import uvloop
+        uvloop.install()
+        _logger.info("uvloop успешно активирован")
+    except ImportError:
+        _logger.info("Модуль uvloop не найден в окружении")
+    except Exception as e:
+        _logger.info("Не удалось активировать uvloop: %s", e)

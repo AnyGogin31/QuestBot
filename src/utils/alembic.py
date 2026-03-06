@@ -17,7 +17,11 @@
 from alembic import command
 from alembic.config import Config
 
+from .logging import get_logger
 from ..configs import database_config
+
+
+_logger = get_logger(__name__)
 
 
 def configure_alembic():
@@ -25,5 +29,7 @@ def configure_alembic():
         alembic_cfg = Config("alembic.ini")
         alembic_cfg.set_main_option("sqlalchemy.url", database_config.url)
         command.upgrade(alembic_cfg, "head")
+        _logger.info("Миграции Alembic успешно применены")
     except Exception as e:
+        _logger.exception("Ошибка при применении миграций Alembic: %s", e)
         raise e

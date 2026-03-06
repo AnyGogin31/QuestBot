@@ -23,6 +23,10 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from ..configs import database_config
+from ..utils.logging import get_logger
+
+
+_logger = get_logger(__name__)
 
 
 engine = create_async_engine(
@@ -44,6 +48,6 @@ async def database_session():
         await session.commit()
     except Exception as e:
         await session.rollback()
-        raise e
+        _logger.exception("Ошибка при выполнении операции с базой данных: %s", e)
     finally:
         await session.close()

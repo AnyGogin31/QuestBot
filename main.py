@@ -15,9 +15,11 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from src.utils.alembic import configure_alembic
+from src.utils.logging import configure_logging
 
 
 def main():
+    configure_logging()
     configure_alembic()
 
 

@@ -26,6 +26,8 @@ from redis.asyncio import Redis
 
 from .configs import bot_config, redis_config
 from .database import engine
+from .handlers import all_handlers
+from .utils.dispatcher import include_handlers
 from .utils.logging import get_logger
 
 
@@ -57,6 +59,8 @@ async def create_dispatcher():
 async def start_bot():
     bot = await create_bot()
     dispatcher = await create_dispatcher()
+
+    include_handlers(dispatcher, all_handlers)
 
     _logger.info("Запуск бота в режиме polling...")
     try:

@@ -14,5 +14,58 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from aiogram import (
+    Bot,
+    Dispatcher
+)
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram.fsm.storage.redis import RedisStorage
+
+from redis.asyncio import Redis
+
+from .configs import bot_config, redis_config
+from .database import engine
+from .utils.logging import get_logger
+
+
+_logger = get_logger(__name__)
+
+
+async def create_bot():
+    token = bot_config.token.get_secret_value()
+    default = DefaultBotProperties(
+        parse_mode=ParseMode.HTML,
+        link_preview_is_disabled=True
+    )
+
+    return Bot(
+        token=token,
+        default=default
+    )
+
+
+async def create_dispatcher():
+    redis = Redis.from_url(redis_config.url)
+    storage = RedisStorage(redis)
+
+    return Dispatcher(
+        storage=storage
+    )
+
+
 async def start_bot():
-    pass
+    bot = await create_bot()
+    dispatcher = await create_dispatcher()
+
+    _logger.info("Запуск бота в режиме polling...")
+    try:
+        await bot.delete_webhook(drop_pending_updates=True)
+        await dispatcher.start_polling(bot)
+    except Exception as e:
+        _logger.exception("Ошибка во время работы polling: %s", e)
+    finally:
+        _logger.info("Остановка бота...")
+        await bot.session.close()
+        await engine.dispose()
+        _logger.info("Бот остановлен")

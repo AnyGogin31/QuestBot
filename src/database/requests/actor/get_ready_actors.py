@@ -1,0 +1,36 @@
+#  QuestBot
+#  Copyright (C) 2026 AnyGogin31
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Affero General Public License as
+#  published by the Free Software Foundation, either version 3 of the
+#  License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU Affero General Public License for more details.
+#
+#  You should have received a copy of the GNU Affero General Public License
+#  along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+from uuid import UUID
+
+from sqlalchemy import select
+
+from ... import database_session
+from ...models import ActorModel
+from ...models.common import ActorStatus
+
+
+async def get_ready_actors(
+        game_id: UUID
+):
+    async with database_session() as session:
+        result = await session.execute(
+            select(ActorModel).where(
+                ActorModel.game_id == game_id,
+                ActorModel.status == ActorStatus.FREE
+            )
+        )
+        return list(result.scalars().all())

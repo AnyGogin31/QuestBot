@@ -49,5 +49,6 @@ async def database_session():
     except Exception as e:
         await session.rollback()
         _logger.exception("Ошибка при выполнении операции с базой данных: %s", e)
+        raise e
     finally:
         await session.close()

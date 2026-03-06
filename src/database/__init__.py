@@ -14,12 +14,36 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from src.utils.alembic import configure_alembic
+from contextlib import asynccontextmanager
+
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine
+)
+
+from ..configs import database_config
 
 
-def main():
-    configure_alembic()
+engine = create_async_engine(
+    url=database_config.url,
+    echo=False
+)
 
+session_factory = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
 
-if __name__ == "__main__":
-    main()
+@asynccontextmanager
+async def database_session():
+    session = session_factory()
+    try:
+        yield session
+        await session.commit()
+    except Exception as e:
+        await session.rollback()
+        raise e
+    finally:
+        await session.close()

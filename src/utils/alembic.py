@@ -14,12 +14,16 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from src.utils.alembic import configure_alembic
+from alembic import command
+from alembic.config import Config
+
+from ..configs import database_config
 
 
-def main():
-    configure_alembic()
-
-
-if __name__ == "__main__":
-    main()
+def configure_alembic():
+    try:
+        alembic_cfg = Config("alembic.ini")
+        alembic_cfg.set_main_option("sqlalchemy.url", database_config.url)
+        command.upgrade(alembic_cfg, "head")
+    except Exception as e:
+        raise e

@@ -14,12 +14,17 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from src.utils.alembic import configure_alembic
+from pydantic_settings import (
+    BaseSettings,
+    SettingsConfigDict
+)
+from pydantic import Field
 
 
-def main():
-    configure_alembic()
+class DatabaseSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix="DB_",
+        case_sensitive=False
+    )
 
-
-if __name__ == "__main__":
-    main()
+    url: str = Field(alias="DATABASE_URL")

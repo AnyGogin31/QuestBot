@@ -30,7 +30,7 @@ router = Router()
 
 
 @router.message(JoinCommanderStates.waiting_team_name)
-async def step_team_name(message: Message, state: FSMContext):
+async def step_team_name(message: Message, state: FSMContext) -> None:
     name = message.text.strip()
     if not name:
         await message.answer("❌ Название не может быть пустым")
@@ -41,7 +41,7 @@ async def step_team_name(message: Message, state: FSMContext):
 
 
 @router.message(JoinCommanderStates.waiting_member_count)
-async def step_member_count(message: Message, state: FSMContext):
+async def step_member_count(message: Message, state: FSMContext) -> None:
     if message.text.strip() == "/skip":
         count = 1
     else:
@@ -64,7 +64,8 @@ async def step_member_count(message: Message, state: FSMContext):
         await state.set_state(CommanderStates.lobby)
         await state.update_data(team_id=str(existing.id))
         await message.answer(
-            "ℹ️ Вы уже зарегистрированы в этой игре", reply_markup=commander_lobby()
+            "ℹ️ Вы уже зарегистрированы в этой игре",
+            reply_markup=commander_lobby(),
         )
         return
 

@@ -24,21 +24,12 @@ class CreateGameStates(StatesGroup):
     waiting_max_score = State()
 
 
-class AuthorStates(StatesGroup):
-    main = State()
-    dashboard = State()
-
-
 class EditTeamStates(StatesGroup):
-    select_team = State()
-    select_field = State()
     waiting_name = State()
     waiting_count = State()
 
 
 class EditActorStates(StatesGroup):
-    select_actor = State()
-    select_field = State()
     waiting_name = State()
     waiting_location = State()
     waiting_description = State()

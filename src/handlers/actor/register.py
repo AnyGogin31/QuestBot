@@ -45,7 +45,7 @@ async def step_location(message: Message, state: FSMContext) -> None:
     loc = None if message.text.strip() == "/skip" else message.text.strip()
     await state.update_data(location=loc)
     await state.set_state(JoinActorStates.waiting_description)
-    await message.answer("📝 Добавьте описание персонажа для команд (или /skip):")
+    await message.answer("📝 Добавьте описание персонажа (или /skip):")
 
 
 @router.message(JoinActorStates.waiting_description)
@@ -62,7 +62,8 @@ async def step_description(message: Message, state: FSMContext) -> None:
         await state.set_state(ActorStates.lobby)
         await state.update_data(actor_id=str(existing.id))
         await message.answer(
-            "ℹ️ Вы уже зарегистрированы как актёр", reply_markup=actor_lobby()
+            "ℹ️ Вы уже зарегистрированы как актёр",
+            reply_markup=actor_lobby(),
         )
         return
 

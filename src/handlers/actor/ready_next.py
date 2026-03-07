@@ -16,28 +16,38 @@
 
 from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from uuid import UUID
 
 from ..notification import notify_team_new_actor, notify_actor_incoming_team
-from ...database.models.common import ActorStatus
+from ...database.models.common import ActorStatus, GameStatus
 from ...database.requests.actor import get_actor_by_id, set_actor_status
+from ...database.requests.game import get_game_by_code
 from ...database.requests.stage import find_and_assign_waiting_team
 from ...keyboards.actor import actor_in_game
 from ...states import ActorStates
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
 
-@router.message(ActorStates.in_game, F.text == "➡️ Готов к следующей команде")
-async def ready_next(message: Message, state: FSMContext, bot: Bot) -> None:
+@router.callback_query(F.data == "actor:ready_next", ActorStates.in_game)
+async def ready_next(callback: CallbackQuery, state: FSMContext, bot: Bot) -> None:
     data = await state.get_data()
-    actor = await get_actor_by_id(UUID(data["actor_id"]))
 
+    game = await get_game_by_code(data["game_code"])
+    if game.status != GameStatus.RUNNING:
+        await callback.answer("⏳ Игра ещё не запущена организатором", show_alert=True)
+        return
+
+    actor = await get_actor_by_id(UUID(data["actor_id"]))
     if actor.status == ActorStatus.BUSY:
-        await message.answer("⚠️ Вы сейчас обслуживаете команду. Сначала завершите этап")
+        await callback.answer(
+            "⚠️ Вы сейчас обслуживаете команду. Сначала завершите этап",
+            show_alert=True,
+        )
         return
 
     waiting_team = await find_and_assign_waiting_team(actor.game_id, actor.id)
@@ -46,14 +56,16 @@ async def ready_next(message: Message, state: FSMContext, bot: Bot) -> None:
         actor_refreshed = await get_actor_by_id(actor.id)
         await notify_team_new_actor(bot, waiting_team, actor_refreshed)
         await notify_actor_incoming_team(bot, actor_refreshed, waiting_team)
-        await message.answer(
+        await safe_edit(
+            callback,
             f"👥 <b>Вам назначена новая команда: '{esc(waiting_team.name)}'!</b>",
-            reply_markup=actor_in_game(),
+            actor_in_game(),
         )
     else:
         await set_actor_status(actor.id, ActorStatus.FREE)
-        await message.answer(
+        await safe_edit(
+            callback,
             "⏳ <b>Ожидание следующей команды...</b>\n"
             "Как только команда освободится вам придёт уведомление",
-            reply_markup=actor_in_game(),
+            actor_in_game(),
         )

@@ -16,7 +16,7 @@
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from uuid import UUID
 
@@ -24,17 +24,18 @@ from ...database.models.common import ActorStatus
 from ...database.requests.actor import set_actor_status
 from ...keyboards.actor import actor_in_game
 from ...states import ActorStates
-
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
 
-@router.message(ActorStates.lobby, F.text == "✅ Готов к игре")
-async def ready(message: Message, state: FSMContext):
+@router.callback_query(F.data == "actor:ready", ActorStates.lobby)
+async def ready(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     await set_actor_status(UUID(data["actor_id"]), ActorStatus.FREE)
     await state.set_state(ActorStates.in_game)
-    await message.answer(
+    await safe_edit(
+        callback,
         "✅ <b>Готов к игре!</b>\n\nОжидайте назначения команды от организатора",
-        reply_markup=actor_in_game(),
+        actor_in_game(),
     )

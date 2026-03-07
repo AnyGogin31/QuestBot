@@ -15,8 +15,7 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from aiogram import Router, F, Bot
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from ..notification import notify_team_new_actor, notify_actor_incoming_team
 from ...database.models.common import GameStatus
@@ -25,47 +24,47 @@ from ...database.requests.game import get_game_by_code, start_game
 from ...database.requests.stage import find_and_assign_next_actor
 from ...database.requests.team import get_ready_teams
 from ...keyboards.author import author_dashboard
-from ...states import AuthorStates
-
+from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
 
-@router.message(AuthorStates.dashboard, F.text == "🚀 Запустить игру")
-async def do_start_game(message: Message, state: FSMContext, bot: Bot):
-    data = await state.get_data()
-    game = await get_game_by_code(data["game_code"])
+@router.callback_query(F.data.startswith("author:start_game:"))
+async def do_start_game(callback: CallbackQuery, bot: Bot) -> None:
+    code = callback.data.split(":", 2)[2]
+    game = await get_game_by_code(code)
 
     if game.status not in (GameStatus.CREATED, GameStatus.PREPARED):
-        await message.answer("❌ Игра уже запущена или завершена")
+        await callback.answer("❌ Игра уже запущена или завершена", show_alert=True)
         return
 
     ready_teams = await get_ready_teams(game.id)
     ready_actors = await get_free_actors_in_game(game.id)
 
     if not ready_teams:
-        await message.answer(
-            "❌ Нет готовых команд. Дождитесь нажатия 'Готов к игре' от командиров"
-        )
+        await callback.answer("❌ Нет готовых команд", show_alert=True)
         return
     if not ready_actors:
-        await message.answer("❌ Нет готовых актёров")
+        await callback.answer("❌ Нет готовых актёров", show_alert=True)
         return
 
-    game = await start_game(data["game_code"])
-
+    game = await start_game(code)
     assignments = []
     for team in ready_teams:
         actor = await find_and_assign_next_actor(game.id, team.id)
         if actor:
             assignments.append((team, actor))
 
-    await message.answer(
+    title = esc(game.title) or f"Игра {game.code}"
+    await safe_edit(
+        callback,
         f"🚀 <b>Игра запущена!</b>\n\n"
-        f"✅ Команд: {len(ready_teams)}\n"
-        f"🎭 Актёров: {len(ready_actors)}\n"
+        f"📛 {title}\n"
+        f"✅ Команд в игре: {len(ready_teams)}\n"
+        f"🎭 Актёров в игре: {len(ready_actors)}\n"
         f"📌 Назначено этапов: {len(assignments)}",
-        reply_markup=author_dashboard(game.status),
+        author_dashboard(code, game.status),
     )
 
     for team, actor in assignments:

@@ -15,28 +15,30 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from aiogram import Router, F
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from ...database.requests.game import get_game_by_code
 from ...database.requests.stage import get_game_stats
-from ...states import AuthorStates
-
+from ...keyboards.author import author_dashboard
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
 
-@router.message(AuthorStates.dashboard, F.text == "📊 Статус игры")
-async def game_status(message: Message, state: FSMContext) -> None:
-    data = await state.get_data()
-    game = await get_game_by_code(data["game_code"])
+@router.callback_query(F.data.startswith("author:game_status:"))
+async def game_status(callback: CallbackQuery) -> None:
+    code = callback.data.split(":", 2)[2]
+    game = await get_game_by_code(code)
     s = await get_game_stats(game.id)
     pct = round(s["done_stages"] / s["total_stages"] * 100) if s["total_stages"] else 0
-    await message.answer(
+
+    await safe_edit(
+        callback,
         f"📊 <b>Статус игры {game.code}</b>\n\n"
         f"👥 Активных команд: {s['active_teams']}\n"
         f"🏁 Финишировавших: {s['finished_teams']}\n"
         f"🎭 Свободных актёров: {s['free_actors']}\n"
         f"🔄 Занятых актёров: {s['busy_actors']}\n"
         f"📈 Этапов: {s['done_stages']}/{s['total_stages']} ({pct}%)",
+        author_dashboard(code, game.status),
     )

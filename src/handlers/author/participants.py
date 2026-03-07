@@ -15,53 +15,56 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from aiogram import Router, F
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from ...database.models.common import TeamStatus, ActorStatus
 from ...database.requests.actor import get_actors_in_game
 from ...database.requests.game import get_game_by_code
 from ...database.requests.team import get_teams_in_game
-from ...states import AuthorStates
+from ...keyboards.author import author_dashboard
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
 
-_TEAM_STATUS_LABELS = {
+_TEAM_STATUS = {
     TeamStatus.IDLE: "⏳ ожидает",
     TeamStatus.EN_ROUTE: "🚶 готова",
     TeamStatus.AT_ACTOR: "🎭 у актёра",
     TeamStatus.FINISHED: "🏁 финиш",
 }
-_ACTOR_STATUS_LABELS = {
+_ACTOR_STATUS = {
     ActorStatus.FREE: "✅ свободен",
     ActorStatus.BUSY: "🔄 занят",
     ActorStatus.WAITING_SCORE: "⏳ выставляет баллы",
 }
 
 
-@router.message(AuthorStates.dashboard, F.text == "👥 Участники")
-async def participants(message: Message, state: FSMContext):
-    data = await state.get_data()
-    game = await get_game_by_code(data["game_code"])
+@router.callback_query(F.data.startswith("author:participants:"))
+async def participants(callback: CallbackQuery) -> None:
+    code = callback.data.split(":", 2)[2]
+    game = await get_game_by_code(code)
     teams = await get_teams_in_game(game.id)
     actors = await get_actors_in_game(game.id)
 
     text = f"👥 <b>Участники игры {game.code}</b>\n\n"
     text += f"<b>Команды ({len(teams)}):</b>\n"
     for t in teams:
-        label = _TEAM_STATUS_LABELS.get(t.status, str(t.status))
+        label = _TEAM_STATUS.get(t.status, str(t.status))
         text += f"  {label} - {esc(t.name)} ({t.member_count} чел.)\n"
 
     text += f"\n<b>Актёры ({len(actors)}):</b>\n"
     for a in actors:
-        label = _ACTOR_STATUS_LABELS.get(a.status, str(a.status))
+        label = _ACTOR_STATUS.get(a.status, str(a.status))
         loc = f" [{esc(a.location)}]" if a.location else ""
-        score_range = ""
-        if a.min_score is not None or a.max_score is not None:
-            mn = a.min_score if a.min_score is not None else game.min_score
-            mx = a.max_score if a.max_score is not None else game.max_score
-            score_range = f" ({mn}-{mx})"
+        mn = a.min_score if a.min_score is not None else game.min_score
+        mx = a.max_score if a.max_score is not None else game.max_score
+        score_range = (
+            f" ({mn}-{mx})"
+            if (a.min_score is not None or a.max_score is not None)
+            else ""
+        )
         text += f"  {label} - {esc(a.name)}{loc}{score_range}\n"
-    await message.answer(text)
+
+    await safe_edit(callback, text, author_dashboard(code, game.status))

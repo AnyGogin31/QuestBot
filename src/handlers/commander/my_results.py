@@ -16,24 +16,26 @@
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from uuid import UUID
 
 from ...database.requests.stage import get_team_completed_stages
+from ...keyboards.commander import commander_finished
 from ...states import CommanderStates
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
 
-@router.message(CommanderStates.finished, F.text == "🏆 Мои результаты")
-async def my_results(message: Message, state: FSMContext):
+@router.callback_query(F.data == "commander:results", CommanderStates.finished)
+async def my_results(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     stages = await get_team_completed_stages(UUID(data["team_id"]))
 
     if not stages:
-        await message.answer("Результатов пока нет")
+        await callback.answer("Результатов пока нет", show_alert=True)
         return
 
     text = "🏆 <b>Ваши результаты:</b>\n\n"
@@ -43,4 +45,4 @@ async def my_results(message: Message, state: FSMContext):
         text += f"🎭 {esc(a.name)}: <b>{s.score}</b> баллов\n"
         total += s.score or 0
     text += f"\n<b>Итого: {total} баллов</b>"
-    await message.answer(text)
+    await safe_edit(callback, text, commander_finished())

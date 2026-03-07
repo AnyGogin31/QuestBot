@@ -17,11 +17,9 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def actor_fields(actor_id):
+def actor_fields(actor_id: str, game_code: str):
     builder = InlineKeyboardBuilder()
-    builder.button(
-        text="📝 Имя персонажа", callback_data=f"actor_field:{actor_id}:name"
-    )
+    builder.button(text="📝 Имя", callback_data=f"actor_field:{actor_id}:name")
     builder.button(text="📍 Локация", callback_data=f"actor_field:{actor_id}:location")
     builder.button(
         text="📋 Описание", callback_data=f"actor_field:{actor_id}:description"
@@ -32,6 +30,6 @@ def actor_fields(actor_id):
     builder.button(
         text="⬆️ Макс. балл", callback_data=f"actor_field:{actor_id}:max_score"
     )
-    builder.button(text="❌ Отмена", callback_data="edit_cancel")
+    builder.button(text="❌ Отмена", callback_data=f"author:open:{game_code}")
     builder.adjust(2)
     return builder.as_markup()

@@ -14,19 +14,34 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from ...database.models.common import GameStatus
 
 
-def author_dashboard(status: GameStatus):
-    builder = ReplyKeyboardBuilder()
+def author_dashboard(game_code: str, status: GameStatus):
+    builder = InlineKeyboardBuilder()
     if status in (GameStatus.CREATED, GameStatus.PREPARED):
-        builder.button(text="🚀 Запустить игру")
+        builder.button(
+            text="🚀 Запустить игру", callback_data=f"author:start_game:{game_code}"
+        )
     if status == GameStatus.RUNNING:
-        builder.button(text="🏁 Завершить игру")
-        builder.button(text="📊 Статус игры")
-    builder.button(text="👥 Участники")
-    builder.button(text="🔙 Главное меню")
+        builder.button(
+            text="📊 Статус игры", callback_data=f"author:game_status:{game_code}"
+        )
+        builder.button(
+            text="🏁 Завершить игру", callback_data=f"author:finish_game:{game_code}"
+        )
+    if status != GameStatus.FINISHED:
+        builder.button(
+            text="✏️ Изменить команду", callback_data=f"author:edit_team:{game_code}"
+        )
+        builder.button(
+            text="✏️ Изменить актёра", callback_data=f"author:edit_actor:{game_code}"
+        )
+    builder.button(
+        text="👥 Участники", callback_data=f"author:participants:{game_code}"
+    )
+    builder.button(text="🔙 Мои игры", callback_data="author:my_games")
     builder.adjust(1)
-    return builder.as_markup(resize_keyboard=True)
+    return builder.as_markup()

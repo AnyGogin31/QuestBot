@@ -14,14 +14,14 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def actor_in_game():
-    button = ReplyKeyboardBuilder()
-    button.button(text="🏁 Команда прибыла")
-    button.button(text="✅ Этап завершён")
-    button.button(text="➡️ Готов к следующей команде")
-    button.button(text="📋 Список команд")
-    button.adjust(2)
-    return button.as_markup(resize_keyboard=True)
+    builder = InlineKeyboardBuilder()
+    builder.button(text="🏁 Команда прибыла", callback_data="actor:team_arrived")
+    builder.button(text="✅ Этап завершён", callback_data="actor:stage_complete")
+    builder.button(text="➡️ Готов к следующей команде", callback_data="actor:ready_next")
+    builder.button(text="📋 Список команд", callback_data="actor:teams_list")
+    builder.adjust(2)
+    return builder.as_markup()

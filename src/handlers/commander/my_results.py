@@ -24,6 +24,7 @@ from ...database.requests.stage import get_team_completed_stages
 from ...keyboards.commander import commander_finished
 from ...states import CommanderStates
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -44,4 +45,4 @@ async def my_results(callback: CallbackQuery, state: FSMContext) -> None:
         text += f"🎭 {esc(a.name)}: <b>{s.score}</b> баллов\n"
         total += s.score or 0
     text += f"\n<b>Итого: {total} баллов</b>"
-    await callback.message.edit_text(text, reply_markup=commander_finished())
+    await safe_edit(callback, text, commander_finished())

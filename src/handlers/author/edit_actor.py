@@ -26,6 +26,7 @@ from ...keyboards.author.actor_fields import actor_fields
 from ...keyboards.author.actors_edit import actors_edit
 from ...states.author import EditActorStates
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -55,9 +56,10 @@ async def edit_actor_start(callback: CallbackQuery, state: FSMContext) -> None:
         await callback.answer("Нет зарегистрированных актёров", show_alert=True)
         return
     await state.update_data(game_code=code)
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         "✏️ <b>Выберите актёра для редактирования:</b>",
-        reply_markup=actors_edit(code, actors),
+        actors_edit(code, actors),
     )
 
 
@@ -67,9 +69,10 @@ async def edit_actor_select(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     await state.update_data(edit_actor_id=actor_id)
     actor = await get_actor_by_id(UUID(actor_id))
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         f"✏️ <b>Актёр: {esc(actor.name)}</b>\n\nЧто изменить?",
-        reply_markup=actor_fields(actor_id, data["game_code"]),
+        actor_fields(actor_id, data["game_code"]),
     )
 
 
@@ -78,10 +81,10 @@ async def edit_actor_field_select(callback: CallbackQuery, state: FSMContext) ->
     _, actor_id, field = callback.data.split(":")
     await state.update_data(edit_actor_id=actor_id)
     await state.set_state(_FIELD_STATES[field])
-    await callback.message.edit_text(_FIELD_PROMPTS[field])
+    await safe_edit(callback, _FIELD_PROMPTS[field])
 
 
-async def _finish(message: Message, state: FSMContext, text: str) -> None:
+async def _done(message: Message, state: FSMContext, text: str) -> None:
     data = await state.get_data()
     game = await get_game_by_code(data["game_code"])
     await state.set_state(None)
@@ -96,7 +99,7 @@ async def save_actor_name(message: Message, state: FSMContext) -> None:
         return
     data = await state.get_data()
     await update_actor(UUID(data["edit_actor_id"]), name=name)
-    await _finish(message, state, f"✅ Имя персонажа изменено на '{esc(name)}'")
+    await _done(message, state, f"✅ Имя персонажа изменено на '{esc(name)}'")
 
 
 @router.message(EditActorStates.waiting_location)
@@ -105,7 +108,7 @@ async def save_actor_location(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     await update_actor(UUID(data["edit_actor_id"]), location=loc)
     val = esc(loc) if loc else "<i>очищена</i>"
-    await _finish(message, state, f"✅ Локация обновлена: {val}")
+    await _done(message, state, f"✅ Локация обновлена: {val}")
 
 
 @router.message(EditActorStates.waiting_description)
@@ -113,7 +116,7 @@ async def save_actor_description(message: Message, state: FSMContext) -> None:
     desc = None if message.text.strip() == "/skip" else message.text.strip()
     data = await state.get_data()
     await update_actor(UUID(data["edit_actor_id"]), description=desc)
-    await _finish(message, state, "✅ Описание обновлено")
+    await _done(message, state, "✅ Описание обновлено")
 
 
 @router.message(EditActorStates.waiting_min_score)
@@ -131,7 +134,7 @@ async def save_actor_min_score(message: Message, state: FSMContext) -> None:
         await message.answer(f"❌ Минимум должен быть меньше максимума ({max_s})")
         return
     await update_actor(actor.id, min_score=val)
-    await _finish(message, state, f"✅ Минимальный балл актёра: {val}")
+    await _done(message, state, f"✅ Минимальный балл актёра: {val}")
 
 
 @router.message(EditActorStates.waiting_max_score)
@@ -149,4 +152,4 @@ async def save_actor_max_score(message: Message, state: FSMContext) -> None:
         await message.answer(f"❌ Максимум должен быть больше минимума ({min_s})")
         return
     await update_actor(actor.id, max_score=val)
-    await _finish(message, state, f"✅ Максимальный балл актёра: {val}")
+    await _done(message, state, f"✅ Максимальный балл актёра: {val}")

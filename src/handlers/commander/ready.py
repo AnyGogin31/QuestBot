@@ -23,7 +23,7 @@ from uuid import UUID
 from ...database.requests.team import mark_team_ready
 from ...keyboards.commander import commander_lobby
 from ...states import CommanderStates
-
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -32,7 +32,8 @@ router = Router()
 async def ready(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     await mark_team_ready(UUID(data["team_id"]))
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         "✅ <b>Отмечено как 'Готов'!</b>\n\nОжидайте старта от организатора",
-        reply_markup=commander_lobby(),
+        commander_lobby(),
     )

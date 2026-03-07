@@ -25,6 +25,7 @@ from ...database.requests.stage import find_and_assign_next_actor
 from ...database.requests.team import get_ready_teams
 from ...keyboards.author import author_dashboard
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -56,13 +57,14 @@ async def do_start_game(callback: CallbackQuery, bot: Bot) -> None:
             assignments.append((team, actor))
 
     title = esc(game.title) or f"Игра {game.code}"
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         f"🚀 <b>Игра запущена!</b>\n\n"
         f"📛 {title}\n"
         f"✅ Команд в игре: {len(ready_teams)}\n"
         f"🎭 Актёров в игре: {len(ready_actors)}\n"
         f"📌 Назначено этапов: {len(assignments)}",
-        reply_markup=author_dashboard(code, game.status),
+        author_dashboard(code, game.status),
     )
 
     for team, actor in assignments:

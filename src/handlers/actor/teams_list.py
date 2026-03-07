@@ -26,6 +26,7 @@ from ...database.requests.team import get_teams_in_game, count_completed_stages
 from ...keyboards.actor import actor_in_game
 from ...states import ActorStates
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -50,6 +51,10 @@ async def teams_list(callback: CallbackQuery, state: FSMContext) -> None:
     actor = await get_actor_by_id(UUID(data["actor_id"]))
     teams = await get_teams_in_game(actor.game_id)
 
+    if not teams:
+        await callback.answer("Команд пока нет", show_alert=True)
+        return
+
     lines = []
     for team in teams:
         done = await count_completed_stages(team.id)
@@ -60,7 +65,8 @@ async def teams_list(callback: CallbackQuery, state: FSMContext) -> None:
             f" | этапов: {done} | {label}"
         )
 
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         "📋 <b>Список команд:</b>\n\n" + "\n".join(lines),
-        reply_markup=actor_in_game(),
+        actor_in_game(),
     )

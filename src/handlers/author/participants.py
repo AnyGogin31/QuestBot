@@ -23,6 +23,7 @@ from ...database.requests.game import get_game_by_code
 from ...database.requests.team import get_teams_in_game
 from ...keyboards.author import author_dashboard
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -66,7 +67,4 @@ async def participants(callback: CallbackQuery) -> None:
         )
         text += f"  {label} - {esc(a.name)}{loc}{score_range}\n"
 
-    await callback.message.edit_text(
-        text,
-        reply_markup=author_dashboard(code, game.status),
-    )
+    await safe_edit(callback, text, author_dashboard(code, game.status))

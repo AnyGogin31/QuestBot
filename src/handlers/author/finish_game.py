@@ -23,6 +23,7 @@ from ...database.requests.game import get_game_by_code, finish_game
 from ...database.requests.stage import get_game_results
 from ...keyboards.author import confirm_finish_game, author_main
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -30,9 +31,10 @@ router = Router()
 @router.callback_query(F.data.startswith("author:finish_game:"))
 async def finish_game_prompt(callback: CallbackQuery) -> None:
     code = callback.data.split(":", 2)[2]
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         "⚠️ <b>Завершить игру?</b>\n\nВсе активные этапы будут остановлены. Действие необратимо",
-        reply_markup=confirm_finish_game(code),
+        confirm_finish_game(code),
     )
 
 
@@ -48,10 +50,10 @@ async def confirm_finish(callback: CallbackQuery, state: FSMContext) -> None:
     results = await get_game_results(game.id)
 
     medals = ["🥇", "🥈", "🥉"]
-    text = "🏁 <b>Игра завершена!</b>\n\n📊 <b>Итоги:</b>\n\n"
+    text = "🏁 <b>Игра завершена!</b>\n\n📊 <b>Итоговый рейтинг:</b>\n\n"
     for i, r in enumerate(results, 1):
         medal = medals[i - 1] if i <= 3 else f"{i}"
         text += f"{medal} <b>{esc(r['team'].name)}</b> - {r['total']} баллов\n"
 
-    await callback.message.edit_text(text, reply_markup=author_main())
-    await state.clear()
+    await state.set_state(None)
+    await safe_edit(callback, text, author_main())

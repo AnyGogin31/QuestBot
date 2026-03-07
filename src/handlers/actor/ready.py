@@ -24,7 +24,7 @@ from ...database.models.common import ActorStatus
 from ...database.requests.actor import set_actor_status
 from ...keyboards.actor import actor_in_game
 from ...states import ActorStates
-
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -34,7 +34,8 @@ async def ready(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     await set_actor_status(UUID(data["actor_id"]), ActorStatus.FREE)
     await state.set_state(ActorStates.in_game)
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         "✅ <b>Готов к игре!</b>\n\nОжидайте назначения команды от организатора",
-        reply_markup=actor_in_game(),
+        actor_in_game(),
     )

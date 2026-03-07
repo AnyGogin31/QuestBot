@@ -20,6 +20,7 @@ from aiogram.types import CallbackQuery
 from ...database.requests.game import get_game_by_code
 from ...database.requests.stage import get_game_stats
 from ...keyboards.author import author_dashboard
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -31,12 +32,13 @@ async def game_status(callback: CallbackQuery) -> None:
     s = await get_game_stats(game.id)
     pct = round(s["done_stages"] / s["total_stages"] * 100) if s["total_stages"] else 0
 
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         f"📊 <b>Статус игры {game.code}</b>\n\n"
         f"👥 Активных команд: {s['active_teams']}\n"
         f"🏁 Финишировавших: {s['finished_teams']}\n"
         f"🎭 Свободных актёров: {s['free_actors']}\n"
         f"🔄 Занятых актёров: {s['busy_actors']}\n"
         f"📈 Этапов: {s['done_stages']}/{s['total_stages']} ({pct}%)",
-        reply_markup=author_dashboard(code, game.status),
+        author_dashboard(code, game.status),
     )

@@ -27,6 +27,7 @@ from ...database.requests.team import count_completed_stages
 from ...keyboards.commander import commander_in_game
 from ...states import CommanderStates
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -45,9 +46,10 @@ async def current_stage(callback: CallbackQuery, state: FSMContext) -> None:
 
     if not stage:
         done = await count_completed_stages(team_id)
-        await callback.message.edit_text(
+        await safe_edit(
+            callback,
             f"⏳ <b>Ожидание следующего актёра...</b>\nПройдено этапов: {done}",
-            reply_markup=commander_in_game(),
+            commander_in_game(),
         )
         return
 
@@ -58,4 +60,4 @@ async def current_stage(callback: CallbackQuery, state: FSMContext) -> None:
     if actor.description:
         text += f"📝 {esc(actor.description)}\n"
     text += f"\n🔄 <b>Статус:</b> {_STAGE_STATUS.get(stage.status, str(stage.status))}"
-    await callback.message.edit_text(text, reply_markup=commander_in_game())
+    await safe_edit(callback, text, commander_in_game())

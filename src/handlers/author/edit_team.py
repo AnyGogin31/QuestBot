@@ -27,6 +27,7 @@ from ...keyboards.author.team_fields import team_fields
 from ...keyboards.author.teams_edit import teams_edit
 from ...states.author import EditTeamStates
 from ...utils.escape import esc
+from ...utils.safe_edit import safe_edit
 
 router = Router()
 
@@ -40,9 +41,10 @@ async def edit_team_start(callback: CallbackQuery, state: FSMContext) -> None:
         await callback.answer("Нет зарегистрированных команд", show_alert=True)
         return
     await state.update_data(game_code=code)
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         "✏️ <b>Выберите команду для редактирования:</b>",
-        reply_markup=teams_edit(code, teams),
+        teams_edit(code, teams),
     )
 
 
@@ -51,9 +53,10 @@ async def edit_team_select(callback: CallbackQuery, state: FSMContext) -> None:
     team_id = callback.data.split(":", 1)[1]
     data = await state.get_data()
     await state.update_data(edit_team_id=team_id)
-    await callback.message.edit_text(
+    await safe_edit(
+        callback,
         "✏️ <b>Что изменить в команде?</b>",
-        reply_markup=team_fields(team_id, data["game_code"]),
+        team_fields(team_id, data["game_code"]),
     )
 
 
@@ -63,12 +66,10 @@ async def edit_team_field_select(callback: CallbackQuery, state: FSMContext) -> 
     await state.update_data(edit_team_id=team_id)
     if field == "name":
         await state.set_state(EditTeamStates.waiting_name)
-        await callback.message.edit_text("✏️ Введите новое <b>название</b> команды:")
+        await safe_edit(callback, "✏️ Введите новое <b>название</b> команды:")
     elif field == "count":
         await state.set_state(EditTeamStates.waiting_count)
-        await callback.message.edit_text(
-            "✏️ Введите новое <b>количество участников</b>:"
-        )
+        await safe_edit(callback, "✏️ Введите новое <b>количество участников</b>:")
 
 
 @router.message(EditTeamStates.waiting_name)

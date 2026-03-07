@@ -14,7 +14,11 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from .bot import BotSettings
 from .database import DatabaseSettings
+from .redis import RedisSettings
 
 
+bot_config = BotSettings()
 database_config = DatabaseSettings()
+redis_config = RedisSettings()

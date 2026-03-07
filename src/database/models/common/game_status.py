@@ -19,8 +19,8 @@ from enum import StrEnum, unique
 
 @unique
 class GameStatus(StrEnum):
-    CREATED = 'created'
-    PREPARED = 'prepared'
-    RUNNING = 'running'
-    FINISHED = 'finished'
-    CANCELLED = 'cancelled'
+    CREATED = "created"
+    PREPARED = "prepared"
+    RUNNING = "running"
+    FINISHED = "finished"
+    CANCELLED = "cancelled"

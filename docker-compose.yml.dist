@@ -1,11 +1,33 @@
 services:
-  quest-bot:
+  bot:
     build: .
     image: quest-bot:latest
     container_name: QuestBot
     restart: unless-stopped
+    depends_on:
+      bot-fsm:
+        condition: service_healthy
     env_file:
       - .env
+    networks:
+      - bot-network
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
+
+  bot-fsm:
+    image: redis:8.6.1-alpine
+    container_name: QuestBotFSM
+    restart: unless-stopped
+    networks:
+      - bot-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  bot-network:
+    name: bot-network
+    driver: bridge

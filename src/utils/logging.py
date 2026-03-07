@@ -40,22 +40,14 @@ def configure_logging():
     console_handler.setLevel(logging.INFO)
 
     file_handler = TimedRotatingFileHandler(
-        filename=log_file_path,
-        when="midnight",
-        encoding="utf-8"
+        filename=log_file_path, when="midnight", encoding="utf-8"
     )
 
     file_handler.suffix = "%d_%m_%Y.log"
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
 
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[
-            console_handler,
-            file_handler
-        ]
-    )
+    logging.basicConfig(level=logging.INFO, handlers=[console_handler, file_handler])
 
 
 def get_logger(name):

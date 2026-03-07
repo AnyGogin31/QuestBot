@@ -18,73 +18,40 @@ from datetime import datetime
 
 from typing import Optional
 
-from uuid import (
-    UUID,
-    uuid7
-)
+from uuid import UUID, uuid7
 
-from sqlalchemy import (
-    DateTime,
-    Enum,
-    ForeignKey,
-    Text,
-    Uuid
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship
-)
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, Text, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import BaseModel
 from .common import StageStatus
 
 
 class StageModel(BaseModel):
-    __tablename__ = 'stages'
+    __tablename__ = "stages"
 
     id: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid7
+        Uuid(as_uuid=True), primary_key=True, default=uuid7
     )
 
-    game_id: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        ForeignKey("games.id")
-    )
+    game_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("games.id"))
 
-    team_id: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        ForeignKey("teams.id")
-    )
+    team_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("teams.id"))
 
-    actor_id: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        ForeignKey("actors.id")
-    )
+    actor_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("actors.id"))
 
     status: Mapped[StageStatus] = mapped_column(
-        Enum(StageStatus),
-        default=StageStatus.ASSIGNED
+        Enum(StageStatus), default=StageStatus.ASSIGNED
     )
 
-    comment: Mapped[Optional[str]] = mapped_column(
-        Text
-    )
+    score: Mapped[Optional[int]] = mapped_column(Integer)
 
-    completed_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime
-    )
+    comment: Mapped[Optional[str]] = mapped_column(Text)
 
-    game: Mapped["GameModel"] = relationship(
-        back_populates="stages"
-    )
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
-    team: Mapped["TeamModel"] = relationship(
-        back_populates="stages"
-    )
+    game: Mapped["GameModel"] = relationship(back_populates="stages")
 
-    actor: Mapped["ActorModel"] = relationship(
-        back_populates="stages"
-    )
+    team: Mapped["TeamModel"] = relationship(back_populates="stages")
+
+    actor: Mapped["ActorModel"] = relationship(back_populates="stages")

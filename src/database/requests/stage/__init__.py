@@ -25,4 +25,4 @@ from .get_game_stats import get_game_stats
 from .get_team_completed_stages import get_team_completed_stages
 from .has_unvisited_actors import has_unvisited_actors
 from .mark_arrived import mark_team_arrived
-from .set_actor_free import create_actor
+from .set_actor_free import set_actor_free

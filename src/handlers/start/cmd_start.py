@@ -15,6 +15,68 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from aiogram import Router
+from aiogram.filters import CommandStart, CommandObject
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
+
+from ...database.models.common import GameStatus
+from ...database.requests.game import get_game_by_code, get_game_by_actor_code
+from ...database.requests.user import get_or_create_user
+from ...keyboards.author import author_main
+from ...states import AuthorStates, JoinCommanderStates, JoinActorStates
 
 
 router = Router()
+
+
+_JOINABLE = (GameStatus.CREATED, GameStatus.PREPARED, GameStatus.RUNNING)
+
+
+@router.message(CommandStart())
+async def cmd_start(message: Message, state: FSMContext, command: CommandObject):
+    args = command.args
+    user = await get_or_create_user(
+        telegram_id=message.from_user.id,
+        username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
+    )
+
+    if not args:
+        await state.clear()
+        await state.set_state(AuthorStates.main)
+        await state.update_data(user_id=str(user.id))
+        await message.answer("👋 <b>QuestBot</b>\n\nВыберите действие:", reply_markup=author_main())
+        return
+
+    code = args.strip().upper()
+
+    game = await get_game_by_code(code)
+    if game:
+        if game.status not in _JOINABLE:
+            await message.answer("❌ Эта игра уже завершена или недоступна")
+            return
+        await state.clear()
+        await state.update_data(user_id=str(user.id), game_id=str(game.id), game_code=game.code)
+        await state.set_state(JoinCommanderStates.waiting_team_name)
+        title = game.title or f"Игра {game.code}"
+        await message.answer(
+            f"👥 <b>Регистрация командира</b>\n🎮 Игра: <b>{title}</b>\n\nВведите название вашей команды:"
+        )
+        return
+
+    game = await get_game_by_actor_code(code)
+    if game:
+        if game.status not in _JOINABLE:
+            await message.answer("❌ Эта игра уже завершена или недоступна")
+            return
+        await state.clear()
+        await state.update_data(user_id=str(user.id), game_id=str(game.id), game_code=game.code)
+        await state.set_state(JoinActorStates.waiting_character_name)
+        title = game.title or f"Игра {game.code}"
+        await message.answer(
+            f"🎭 <b>Регистрация актёра</b>\n🎮 Игра: <b>{title}</b>\n\nВведите имя вашего персонажа:"
+        )
+        return
+
+    await message.answer("❌ Игра с таким кодом не найдена")

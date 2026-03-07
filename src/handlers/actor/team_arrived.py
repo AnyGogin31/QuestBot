@@ -14,7 +14,35 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram import Router
+from aiogram import Router, F
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
+
+from uuid import UUID
+
+from ...database.models.common import StageStatus
+from ...database.requests.stage import get_active_stage_for_actor, mark_team_arrived
+from ...keyboards.actor import actor_in_game
+from ...states import ActorStates
 
 
 router = Router()
+
+
+@router.message(ActorStates.in_game, F.text == "🏁 Команда прибыла")
+async def team_arrived(message: Message, state: FSMContext) -> None:
+    data = await state.get_data()
+    stage = await get_active_stage_for_actor(UUID(data['actor_id']))
+
+    if stage is None:
+        await message.answer("⏳ Вам ещё не назначена команда. Ожидайте")
+        return
+    if stage.status != StageStatus.ASSIGNED:
+        await message.answer("ℹ️ Команда уже отмечена как прибывшая")
+        return
+
+    await mark_team_arrived(stage.id)
+    await message.answer(
+        "✅ <b>Команда отмечена как прибывшая.</b>\n\nПосле взаимодействия нажмите 'Этап завершён'",
+        reply_markup=actor_in_game(),
+    )

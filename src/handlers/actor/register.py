@@ -15,6 +15,65 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from aiogram import Router
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 
+from uuid import UUID
+
+from ...database.requests.actor import get_actor_by_user_and_game, create_actor
+from ...database.requests.game import get_game_by_code
+from ...keyboards.actor import actor_lobby
+from ...states import JoinActorStates, ActorStates
 
 router = Router()
+
+
+@router.message(JoinActorStates.waiting_character_name)
+async def step_name(message: Message, state: FSMContext) -> None:
+    name = message.text.strip()
+    if not name:
+        await message.answer("❌ Имя не может быть пустым")
+        return
+    await state.update_data(character_name=name)
+    await state.set_state(JoinActorStates.waiting_location)
+    await message.answer("📍 Укажите вашу локацию (или /skip):")
+
+
+@router.message(JoinActorStates.waiting_location)
+async def step_location(message: Message, state: FSMContext) -> None:
+    loc = None if message.text.strip() == '/skip' else message.text.strip()
+    await state.update_data(location=loc)
+    await state.set_state(JoinActorStates.waiting_description)
+    await message.answer("📝 Добавьте описание персонажа для команд (или /skip):")
+
+
+@router.message(JoinActorStates.waiting_description)
+async def step_description(message: Message, state: FSMContext) -> None:
+    desc = None if message.text.strip() == '/skip' else message.text.strip()
+    data = await state.get_data()
+    user_id = UUID(data['user_id'])
+    game_id = UUID(data['game_id'])
+
+    game = await get_game_by_code(data['game_code'])
+    existing = await get_actor_by_user_and_game(user_id, game_id)
+
+    if existing:
+        await state.set_state(ActorStates.lobby)
+        await state.update_data(actor_id=str(existing.id))
+        await message.answer("ℹ️ Вы уже зарегистрированы как актёр", reply_markup=actor_lobby())
+        return
+
+    actor = await create_actor(
+        game_id=game_id, user_id=user_id,
+        name=data['character_name'], location=data.get('location'), description=desc,
+    )
+    await state.set_state(ActorStates.lobby)
+    await state.update_data(actor_id=str(actor.id))
+    await message.answer(
+        f"✅ <b>Актёр зарегистрирован!</b>\n\n"
+        f"👤 <b>Персонаж:</b> {data['character_name']}\n"
+        f"📍 <b>Локация:</b> {data.get('location') or 'не указана'}\n"
+        f"🎮 <b>Игра:</b> {game.title or game.code}\n\n"
+        f"Нажмите <b>'Готов к игре'</b>, когда займёте позицию",
+        reply_markup=actor_lobby(),
+    )

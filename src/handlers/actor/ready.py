@@ -14,7 +14,27 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram import Router
+from aiogram import Router, F
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
+
+from uuid import UUID
+
+from ...database.models.common import ActorStatus
+from ...database.requests.actor import set_actor_status
+from ...keyboards.actor import actor_in_game
+from ...states import ActorStates
 
 
 router = Router()
+
+
+@router.message(ActorStates.lobby, F.text == "✅ Готов к игре")
+async def ready(message: Message, state: FSMContext):
+    data = await state.get_data()
+    await set_actor_status(UUID(data['actor_id']), ActorStatus.FREE)
+    await state.set_state(ActorStates.in_game)
+    await message.answer(
+        "✅ <b>Готов к игре!</b>\n\nОжидайте назначения команды от организатора",
+        reply_markup=actor_in_game(),
+    )

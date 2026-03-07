@@ -14,25 +14,6 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram import Router, F
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
-
-from uuid import UUID
-
-from ...database.requests.team import mark_team_ready
-from ...keyboards.commander import commander_lobby
-from ...states import CommanderStates
-
-
-router = Router()
-
-
-@router.message(CommanderStates.lobby, F.text == "✅ Готов к игре")
-async def ready(message: Message, state: FSMContext):
-    data = await state.get_data()
-    await mark_team_ready(UUID(data['team_id']))
-    await message.answer(
-        "✅ <b>Отмечено как 'Готов'!</b>\nОжидайте старта от организатора",
-        reply_markup=commander_lobby(),
-    )
+from .notify_actor_incoming_team import notify_actor_incoming_team
+from .notify_team_finished import notify_team_finished
+from .notify_team_new_actor import notify_team_new_actor

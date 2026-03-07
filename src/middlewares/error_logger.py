@@ -15,12 +15,15 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 from ..utils.logging import get_logger
 
 
 _logger = get_logger(__name__)
+
+
+_ERR_TEXT = "⚠️ Произошла внутренняя ошибка. Попробуйте повторить позже"
 
 
 class ErrorLoggerMiddleware(BaseMiddleware):
@@ -29,12 +32,15 @@ class ErrorLoggerMiddleware(BaseMiddleware):
             return await handler(event, data)
         except Exception as exc:
             _logger.exception(
-                "Необработанное исключение в хендлере для user_id=%s: %s",
+                "Необработанное исключение для user_id=%s: %s",
                 getattr(getattr(event, "from_user", None), "id", "?"),
                 exc,
             )
             if isinstance(event, Message):
-                await event.answer(
-                    "⚠️ Произошла внутренняя ошибка. Попробуйте повторить позже"
-                )
+                await event.answer(_ERR_TEXT)
+            elif isinstance(event, CallbackQuery):
+                try:
+                    await event.answer(_ERR_TEXT, show_alert=True)
+                except Exception:
+                    pass
             return None

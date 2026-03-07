@@ -26,6 +26,7 @@ from .database import engine
 from .handlers import all_handlers
 from .utils.dispatcher import include_handlers
 from .utils.logging import get_logger
+from .utils.storage import init_storage_holder
 
 
 _logger = get_logger(__name__)
@@ -49,11 +50,14 @@ async def create_dispatcher():
 
 async def start_bot():
     bot = await create_bot()
+    me = await bot.get_me()
+
     dispatcher = await create_dispatcher()
 
+    init_storage_holder(dispatcher.storage, me.id)
     include_handlers(dispatcher, all_handlers)
 
-    _logger.info("Запуск бота в режиме polling...")
+    _logger.info("Запуск бота @%s в режиме polling...", me.username)
     try:
         await bot.delete_webhook(drop_pending_updates=True)
         await dispatcher.start_polling(bot)

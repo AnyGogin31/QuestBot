@@ -20,6 +20,7 @@ from ...database.models import TeamModel, ActorModel
 from ...database.requests.user import get_user_by_id
 from ...keyboards.commander import commander_in_game
 from ...states import CommanderStates
+from ...utils.fsm import set_user_state
 from ...utils.logging import get_logger
 
 

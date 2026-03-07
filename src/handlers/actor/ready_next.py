@@ -22,7 +22,7 @@ from uuid import UUID
 
 from ..notification import notify_team_new_actor, notify_actor_incoming_team
 from ...database.models.common import ActorStatus
-from ...database.requests.actor import get_actor_by_id
+from ...database.requests.actor import get_actor_by_id, set_actor_status
 from ...database.requests.stage import find_and_assign_waiting_team
 from ...keyboards.actor import actor_in_game
 from ...states import ActorStates

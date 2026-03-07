@@ -23,6 +23,7 @@ from ...database.requests.actor import get_actors_in_game, update_actor, get_act
 from ...database.requests.game import get_game_by_code
 from ...keyboards.author import author_dashboard
 from ...keyboards.author.actor_fields import actor_fields
+from ...keyboards.author.actors_edit import actors_edit
 from ...states import AuthorStates
 from ...states.author import EditActorStates
 
@@ -48,7 +49,7 @@ async def edit_actor_start(message: Message, state: FSMContext) -> None:
         return
     await state.set_state(EditActorStates.select_actor)
     await message.answer(
-        "Выберите актёра для редактирования:", reply_markup=actors_edit_kb(actors)
+        "Выберите актёра для редактирования:", reply_markup=actors_edit(actors)
     )
 
 

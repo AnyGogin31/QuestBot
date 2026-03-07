@@ -20,7 +20,6 @@ from sqlalchemy import select
 
 from ... import database_session
 from ...models import ActorModel
-from ...models.common import ActorStatus
 
 
 _UNSET = object()

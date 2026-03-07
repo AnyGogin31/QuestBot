@@ -26,7 +26,7 @@ from ...database.requests.actor import get_actor_by_id, set_actor_status
 from ...database.requests.stage import find_and_assign_waiting_team
 from ...keyboards.actor import actor_in_game
 from ...states import ActorStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -47,7 +47,7 @@ async def ready_next(message: Message, state: FSMContext, bot: Bot) -> None:
         await notify_team_new_actor(bot, waiting_team, actor_refreshed)
         await notify_actor_incoming_team(bot, actor_refreshed, waiting_team)
         await message.answer(
-            f"👥 <b>Вам назначена новая команда: '{waiting_team.name}'!</b>",
+            f"👥 <b>Вам назначена новая команда: '{esc(waiting_team.name)}'!</b>",
             reply_markup=actor_in_game(),
         )
     else:

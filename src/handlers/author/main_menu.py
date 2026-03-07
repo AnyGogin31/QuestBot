@@ -23,6 +23,7 @@ from uuid import UUID
 from ...database.requests.game import get_games_by_author, get_game_by_code
 from ...keyboards.author import games_list, author_main, author_dashboard
 from ...states import AuthorStates, CreateGameStates
+from ...utils.escape import esc
 
 router = Router()
 
@@ -61,7 +62,7 @@ async def open_game(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AuthorStates.dashboard)
     await state.update_data(game_code=game.code)
     await callback.message.delete()
-    title = game.title or f"Игра {game.code}"
+    title = esc(game.title) or f"Игра {game.code}"
     await callback.message.answer(
         f"📊 <b>Дашборд: {title}</b>\n"
         f"🔑 Командирский код: <code>{game.code}</code>\n"

@@ -26,7 +26,7 @@ from ...database.requests.stage import get_active_stage_for_actor
 from ...database.requests.team import get_team_by_id
 from ...keyboards.actor import actor_confirm_complete
 from ...states import ActorStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -46,7 +46,7 @@ async def stage_complete_prompt(message: Message, state: FSMContext) -> None:
     team = await get_team_by_id(stage.team_id)
     await state.update_data(stage_id=str(stage.id))
     await message.answer(
-        f"⚠️ <b>Завершить этап с командой '{team.name}'?</b>\n\nЭто действие нельзя отменить",
+        f"⚠️ <b>Завершить этап с командой '{esc(team.name)}'?</b>\n\nЭто действие нельзя отменить",
         reply_markup=actor_confirm_complete(team.name),
     )
 

@@ -22,7 +22,7 @@ from uuid import UUID
 
 from ...database.requests.stage import get_team_completed_stages
 from ...states import CommanderStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -40,7 +40,7 @@ async def my_results(message: Message, state: FSMContext):
     total = 0
     for row in stages:
         s, a = row.StageModel, row.ActorModel
-        text += f"🎭 {a.name}: <b>{s.score}</b> баллов\n"
+        text += f"🎭 {esc(a.name)}: <b>{s.score}</b> баллов\n"
         total += s.score or 0
     text += f"\n<b>Итого: {total} баллов</b>"
     await message.answer(text)

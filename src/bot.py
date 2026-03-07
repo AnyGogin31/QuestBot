@@ -18,18 +18,25 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.redis import RedisStorage
+from aiogram.types import BotCommand, BotCommandScopeDefault
 
 from redis.asyncio import Redis
 
 from .configs import bot_config, redis_config
 from .database import engine
 from .handlers import all_handlers
+from .middlewares import ErrorLoggerMiddleware, ThrottlingMiddleware
 from .utils.dispatcher import include_handlers
 from .utils.logging import get_logger
 from .utils.storage import init_storage_holder
 
 
 _logger = get_logger(__name__)
+
+
+BOT_COMMANDS = [
+    BotCommand(command="start", description="Начать работу / войти в игру"),
+]
 
 
 async def create_bot():
@@ -55,12 +62,21 @@ async def start_bot():
     dispatcher = await create_dispatcher()
 
     init_storage_holder(dispatcher.storage, me.id)
+
+    dispatcher.message.middleware(ErrorLoggerMiddleware())
+    dispatcher.callback_query.middleware(ErrorLoggerMiddleware())
+    dispatcher.message.middleware(ThrottlingMiddleware())
+
     include_handlers(dispatcher, all_handlers)
+
+    await bot.set_my_commands(BOT_COMMANDS, scope=BotCommandScopeDefault())
 
     _logger.info("Запуск бота @%s в режиме polling...", me.username)
     try:
         await bot.delete_webhook(drop_pending_updates=True)
-        await dispatcher.start_polling(bot)
+        await dispatcher.start_polling(
+            bot, allowed_updates=dispatcher.resolve_used_update_types()
+        )
     except Exception as e:
         _logger.exception("Ошибка во время работы polling: %s", e)
     finally:

@@ -19,6 +19,7 @@ from aiogram import Bot
 from ...database.models import ActorModel, TeamModel
 from ...database.requests.user import get_user_by_id
 from ...keyboards.actor import actor_in_game
+from ...utils.escape import esc
 from ...utils.logging import get_logger
 
 
@@ -33,7 +34,7 @@ async def notify_actor_incoming_team(
         return
     text = (
         f"👥 <b>К вам направляется команда!</b>\n\n"
-        f"🏷 <b>Название:</b> {team.name}\n"
+        f"🏷 <b>Название:</b> {esc(team.name)}\n"
         f"👤 <b>Участников:</b> {team.member_count}\n"
     )
     try:

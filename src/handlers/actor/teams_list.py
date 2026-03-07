@@ -24,7 +24,7 @@ from ...database.models.common import TeamStatus
 from ...database.requests.actor import get_actor_by_id
 from ...database.requests.team import get_teams_in_game, count_completed_stages
 from ...states import ActorStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -55,7 +55,7 @@ async def teams_list(message: Message, state: FSMContext) -> None:
         em = _STATUS_EMOJI.get(team.status, "❓")
         label = _STATUS_LABELS.get(team.status, str(team.status))
         lines.append(
-            f"{em} <b>{team.name}</b> - {team.member_count} чел. | этапов: {done} | {label}"
+            f"{em} <b>{esc(team.name)}</b> - {team.member_count} чел. | этапов: {done} | {label}"
         )
 
     await message.answer("📋 <b>Список команд:</b>\n\n" + "\n".join(lines))

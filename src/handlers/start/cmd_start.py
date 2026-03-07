@@ -24,7 +24,7 @@ from ...database.requests.game import get_game_by_code, get_game_by_actor_code
 from ...database.requests.user import get_or_create_user
 from ...keyboards.author import author_main
 from ...states import AuthorStates, JoinCommanderStates, JoinActorStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -63,7 +63,7 @@ async def cmd_start(message: Message, state: FSMContext, command: CommandObject)
             user_id=str(user.id), game_id=str(game.id), game_code=game.code
         )
         await state.set_state(JoinCommanderStates.waiting_team_name)
-        title = game.title or f"Игра {game.code}"
+        title = esc(game.title) or f"Игра {game.code}"
         await message.answer(
             f"👥 <b>Регистрация командира</b>\n🎮 Игра: <b>{title}</b>\n\nВведите название вашей команды:"
         )
@@ -79,7 +79,7 @@ async def cmd_start(message: Message, state: FSMContext, command: CommandObject)
             user_id=str(user.id), game_id=str(game.id), game_code=game.code
         )
         await state.set_state(JoinActorStates.waiting_character_name)
-        title = game.title or f"Игра {game.code}"
+        title = esc(game.title) or f"Игра {game.code}"
         await message.answer(
             f"🎭 <b>Регистрация актёра</b>\n🎮 Игра: <b>{title}</b>\n\nВведите имя вашего персонажа:"
         )

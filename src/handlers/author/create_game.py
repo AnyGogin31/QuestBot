@@ -23,7 +23,7 @@ from uuid import UUID
 from ...database.requests.game import create_game
 from ...keyboards.author import author_dashboard
 from ...states import CreateGameStates, AuthorStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -81,8 +81,8 @@ async def step_max_score(message: Message, state: FSMContext) -> None:
     await state.update_data(game_code=game.code)
     await message.answer(
         f"✅ <b>Игра создана!</b>\n\n"
-        f"📛 <b>Название:</b> {game.title or 'Без названия'}\n"
-        f"⚖️ <b>Баллы:</b> {min_score} – {max_score}\n\n"
+        f"📛 <b>Название:</b> {esc(game.title) or 'Без названия'}\n"
+        f"⚖️ <b>Баллы:</b> {min_score} - {max_score}\n\n"
         f"🔑 <b>Ссылка для командиров:</b>\n<code>/start {game.code}</code>\n\n"
         f"🎭 <b>Ссылка для актёров:</b>\n<code>/start {game.actor_code}</code>",
         reply_markup=author_dashboard(game.status),

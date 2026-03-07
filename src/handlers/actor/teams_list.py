@@ -46,7 +46,7 @@ _STATUS_LABELS = {
 @router.message(ActorStates.in_game, F.text == "📋 Список команд")
 async def teams_list(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    actor = await get_actor_by_id(UUID(data['actor_id']))
+    actor = await get_actor_by_id(UUID(data["actor_id"]))
     teams = await get_teams_in_game(actor.game_id)
 
     lines = []
@@ -54,6 +54,8 @@ async def teams_list(message: Message, state: FSMContext) -> None:
         done = await count_completed_stages(team.id)
         em = _STATUS_EMOJI.get(team.status, "❓")
         label = _STATUS_LABELS.get(team.status, str(team.status))
-        lines.append(f"{em} <b>{team.name}</b> - {team.member_count} чел. | этапов: {done} | {label}")
+        lines.append(
+            f"{em} <b>{team.name}</b> - {team.member_count} чел. | этапов: {done} | {label}"
+        )
 
     await message.answer("📋 <b>Список команд:</b>\n\n" + "\n".join(lines))

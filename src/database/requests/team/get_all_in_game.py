@@ -24,5 +24,7 @@ from ...models import TeamModel
 
 async def get_teams_in_game(game_id: UUID):
     async with database_session() as session:
-        result = await session.execute(select(TeamModel).where(TeamModel.game_id == game_id))
+        result = await session.execute(
+            select(TeamModel).where(TeamModel.game_id == game_id)
+        )
         return list(result.scalars().all())

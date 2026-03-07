@@ -30,7 +30,7 @@ router = Router()
 
 @router.message(CreateGameStates.waiting_title)
 async def step_title(message: Message, state: FSMContext) -> None:
-    title = None if message.text.strip() == '/skip' else message.text.strip()
+    title = None if message.text.strip() == "/skip" else message.text.strip()
     await state.update_data(title=title)
     await state.set_state(CreateGameStates.waiting_description)
     await message.answer("Введите описание игры (или /skip):")
@@ -38,7 +38,7 @@ async def step_title(message: Message, state: FSMContext) -> None:
 
 @router.message(CreateGameStates.waiting_description)
 async def step_description(message: Message, state: FSMContext) -> None:
-    desc = None if message.text.strip() == '/skip' else message.text.strip()
+    desc = None if message.text.strip() == "/skip" else message.text.strip()
     await state.update_data(description=desc)
     await state.set_state(CreateGameStates.waiting_min_score)
     await message.answer("Введите минимальный балл (целое число, например <b>0</b>):")
@@ -64,15 +64,15 @@ async def step_max_score(message: Message, state: FSMContext) -> None:
         await message.answer("❌ Введите целое число")
         return
     data = await state.get_data()
-    min_score = data.get('min_score', 0)
+    min_score = data.get("min_score", 0)
     if max_score <= min_score:
         await message.answer(f"❌ Максимум должен быть больше минимума ({min_score})")
         return
 
     game = await create_game(
-        author_id=UUID(data['user_id']),
-        title=data.get('title'),
-        description=data.get('description'),
+        author_id=UUID(data["user_id"]),
+        title=data.get("title"),
+        description=data.get("description"),
         min_score=min_score,
         max_score=max_score,
     )

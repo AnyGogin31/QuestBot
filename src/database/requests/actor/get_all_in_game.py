@@ -24,5 +24,7 @@ from ...models import ActorModel
 
 async def get_actors_in_game(game_id: UUID):
     async with database_session() as session:
-        result = await session.execute(select(ActorModel).where(ActorModel.game_id == game_id))
+        result = await session.execute(
+            select(ActorModel).where(ActorModel.game_id == game_id)
+        )
         return list(result.scalars().all())

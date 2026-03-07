@@ -18,74 +18,40 @@ from datetime import datetime
 
 from typing import List
 
-from uuid import (
-    UUID,
-    uuid7
-)
+from uuid import UUID, uuid7
 
-from sqlalchemy import (
-    DateTime,
-    Enum,
-    ForeignKey,
-    func,
-    Integer,
-    String,
-    Uuid
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship
-)
+from sqlalchemy import DateTime, Enum, ForeignKey, func, Integer, String, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import BaseModel
 from .common import TeamStatus
 
 
 class TeamModel(BaseModel):
-    __tablename__ = 'teams'
+    __tablename__ = "teams"
 
     id: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid7
+        Uuid(as_uuid=True), primary_key=True, default=uuid7
     )
 
-    game_id: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        ForeignKey("games.id")
-    )
+    game_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("games.id"))
 
     commander_id: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        ForeignKey("users.id")
+        Uuid(as_uuid=True), ForeignKey("users.id")
     )
 
-    name: Mapped[str] = mapped_column(
-        String(255)
-    )
+    name: Mapped[str] = mapped_column(String(255))
 
-    member_count: Mapped[int] = mapped_column(
-        Integer,
-        default=1
-    )
+    member_count: Mapped[int] = mapped_column(Integer, default=1)
 
     status: Mapped[TeamStatus] = mapped_column(
-        Enum(TeamStatus),
-        default=TeamStatus.IDLE
+        Enum(TeamStatus), default=TeamStatus.IDLE
     )
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
-    game: Mapped["GameModel"] = relationship(
-        back_populates="teams"
-    )
+    game: Mapped["GameModel"] = relationship(back_populates="teams")
 
     commander: Mapped["UserModel"] = relationship()
 
-    stages: Mapped[List["StageModel"]] = relationship(
-        back_populates="team"
-    )
+    stages: Mapped[List["StageModel"]] = relationship(back_populates="team")

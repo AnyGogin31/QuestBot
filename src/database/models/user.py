@@ -18,59 +18,31 @@ from datetime import datetime
 
 from typing import Optional
 
-from uuid import (
-    UUID,
-    uuid7
-)
+from uuid import UUID, uuid7
 
-from sqlalchemy import (
-    BigInteger,
-    DateTime,
-    func,
-    String,
-    Uuid
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column
-)
+from sqlalchemy import BigInteger, DateTime, func, String, Uuid
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import BaseModel
 
 
 class UserModel(BaseModel):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id: Mapped[UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid7
+        Uuid(as_uuid=True), primary_key=True, default=uuid7
     )
 
-    telegram_id: Mapped[int] = mapped_column(
-        BigInteger,
-        unique=True
-    )
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
 
-    username: Mapped[Optional[str]] = mapped_column(
-        String(255)
-    )
+    username: Mapped[Optional[str]] = mapped_column(String(255))
 
-    first_name: Mapped[Optional[str]] = mapped_column(
-        String(255)
-    )
+    first_name: Mapped[Optional[str]] = mapped_column(String(255))
 
-    last_name: Mapped[Optional[str]] = mapped_column(
-        String(255)
-    )
+    last_name: Mapped[Optional[str]] = mapped_column(String(255))
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=func.now(),
-        onupdate=func.now()
+        DateTime, server_default=func.now(), onupdate=func.now()
     )

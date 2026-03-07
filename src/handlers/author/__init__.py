@@ -35,5 +35,5 @@ router.include_routers(
     game_status_router,
     finish_game_router,
     edit_team_router,
-    edit_actor_router
+    edit_actor_router,
 )

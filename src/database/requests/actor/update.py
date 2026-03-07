@@ -27,15 +27,17 @@ _UNSET = object()
 
 
 async def update_actor(
-        actor_id: UUID,
-        name: object = _UNSET,
-        location: object = _UNSET,
-        description: object = _UNSET,
-        min_score: object = _UNSET,
-        max_score: object = _UNSET,
+    actor_id: UUID,
+    name: object = _UNSET,
+    location: object = _UNSET,
+    description: object = _UNSET,
+    min_score: object = _UNSET,
+    max_score: object = _UNSET,
 ):
     async with database_session() as session:
-        actor = await session.scalar(select(ActorModel).where(ActorModel.id == actor_id))
+        actor = await session.scalar(
+            select(ActorModel).where(ActorModel.id == actor_id)
+        )
         if actor is None:
             return None
         if name is not _UNSET:

@@ -14,20 +14,11 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from pydantic_settings import (
-    BaseSettings,
-    SettingsConfigDict
-)
-from pydantic import (
-    Field,
-    SecretStr
-)
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, SecretStr
 
 
 class BotSettings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_prefix="BOT_",
-        case_sensitive=False
-    )
+    model_config = SettingsConfigDict(env_prefix="BOT_", case_sensitive=False)
 
     token: SecretStr = Field(alias="BOT_TOKEN")

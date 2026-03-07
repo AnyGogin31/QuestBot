@@ -21,7 +21,9 @@ def actors_edit(actors):
     builder = InlineKeyboardBuilder()
     for actor in actors:
         loc = f" [{actor.location}]" if actor.location else ""
-        builder.button(text=f"🎭 {actor.name}{loc}", callback_data=f"edit_actor:{actor.id}")
+        builder.button(
+            text=f"🎭 {actor.name}{loc}", callback_data=f"edit_actor:{actor.id}"
+        )
     builder.button(text="❌ Отмена", callback_data="edit_cancel")
     builder.adjust(1)
     return builder.as_markup()

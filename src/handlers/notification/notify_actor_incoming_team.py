@@ -25,7 +25,9 @@ from ...utils.logging import get_logger
 _logger = get_logger(__name__)
 
 
-async def notify_actor_incoming_team(bot: Bot, actor: ActorModel, team: TeamModel) -> None:
+async def notify_actor_incoming_team(
+    bot: Bot, actor: ActorModel, team: TeamModel
+) -> None:
     user = await get_user_by_id(actor.user_id)
     if not user:
         return

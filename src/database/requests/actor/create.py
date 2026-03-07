@@ -22,11 +22,11 @@ from ...models.common import ActorStatus
 
 
 async def create_actor(
-        game_id: UUID,
-        user_id: UUID,
-        name: str,
-        location: str | None = None,
-        description: str | None = None
+    game_id: UUID,
+    user_id: UUID,
+    name: str,
+    location: str | None = None,
+    description: str | None = None,
 ):
     async with database_session() as session:
         actor = ActorModel(
@@ -35,7 +35,7 @@ async def create_actor(
             name=name,
             location=location,
             description=description,
-            status=ActorStatus.FREE
+            status=ActorStatus.FREE,
         )
         session.add(actor)
         await session.flush()

@@ -39,12 +39,12 @@ async def finish_game_prompt(message: Message) -> None:
 @router.callback_query(F.data == "confirm_finish_game")
 async def confirm_finish(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
     if game.status != GameStatus.RUNNING:
         await callback.answer("Игра не запущена")
         return
 
-    await finish_game(data['game_code'])
+    await finish_game(data["game_code"])
     results = await get_game_results(game.id)
 
     await callback.message.delete()

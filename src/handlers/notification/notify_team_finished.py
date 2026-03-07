@@ -38,4 +38,6 @@ async def notify_team_finished(bot: Bot, team: TeamModel) -> None:
             reply_markup=commander_finished(),
         )
     except Exception as e:
-        _logger.warning("Не удалось уведомить командира о финише %s: %s", user.telegram_id, e)
+        _logger.warning(
+            "Не удалось уведомить командира о финише %s: %s", user.telegram_id, e
+        )

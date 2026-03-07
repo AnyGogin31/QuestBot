@@ -34,7 +34,7 @@ router = Router()
 @router.message(AuthorStates.dashboard, F.text == "🚀 Запустить игру")
 async def do_start_game(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
 
     if game.status not in (GameStatus.CREATED, GameStatus.PREPARED):
         await message.answer("❌ Игра уже запущена или завершена")
@@ -44,13 +44,15 @@ async def do_start_game(message: Message, state: FSMContext, bot: Bot):
     ready_actors = await get_free_actors_in_game(game.id)
 
     if not ready_teams:
-        await message.answer("❌ Нет готовых команд. Дождитесь нажатия 'Готов к игре' от командиров")
+        await message.answer(
+            "❌ Нет готовых команд. Дождитесь нажатия 'Готов к игре' от командиров"
+        )
         return
     if not ready_actors:
         await message.answer("❌ Нет готовых актёров")
         return
 
-    game = await start_game(data['game_code'])
+    game = await start_game(data["game_code"])
 
     assignments = []
     for team in ready_teams:

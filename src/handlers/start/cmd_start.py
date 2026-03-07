@@ -46,7 +46,9 @@ async def cmd_start(message: Message, state: FSMContext, command: CommandObject)
         await state.clear()
         await state.set_state(AuthorStates.main)
         await state.update_data(user_id=str(user.id))
-        await message.answer("👋 <b>QuestBot</b>\n\nВыберите действие:", reply_markup=author_main())
+        await message.answer(
+            "👋 <b>QuestBot</b>\n\nВыберите действие:", reply_markup=author_main()
+        )
         return
 
     code = args.strip().upper()
@@ -57,7 +59,9 @@ async def cmd_start(message: Message, state: FSMContext, command: CommandObject)
             await message.answer("❌ Эта игра уже завершена или недоступна")
             return
         await state.clear()
-        await state.update_data(user_id=str(user.id), game_id=str(game.id), game_code=game.code)
+        await state.update_data(
+            user_id=str(user.id), game_id=str(game.id), game_code=game.code
+        )
         await state.set_state(JoinCommanderStates.waiting_team_name)
         title = game.title or f"Игра {game.code}"
         await message.answer(
@@ -71,7 +75,9 @@ async def cmd_start(message: Message, state: FSMContext, command: CommandObject)
             await message.answer("❌ Эта игра уже завершена или недоступна")
             return
         await state.clear()
-        await state.update_data(user_id=str(user.id), game_id=str(game.id), game_code=game.code)
+        await state.update_data(
+            user_id=str(user.id), game_id=str(game.id), game_code=game.code
+        )
         await state.set_state(JoinActorStates.waiting_character_name)
         title = game.title or f"Игра {game.code}"
         await message.answer(

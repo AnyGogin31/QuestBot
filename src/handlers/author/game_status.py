@@ -29,9 +29,9 @@ router = Router()
 @router.message(AuthorStates.dashboard, F.text == "📊 Статус игры")
 async def game_status(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
     s = await get_game_stats(game.id)
-    pct = round(s['done_stages'] / s['total_stages'] * 100) if s['total_stages'] else 0
+    pct = round(s["done_stages"] / s["total_stages"] * 100) if s["total_stages"] else 0
     await message.answer(
         f"📊 <b>Статус игры {game.code}</b>\n\n"
         f"👥 Активных команд: {s['active_teams']}\n"

@@ -14,10 +14,7 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import (
-    datetime,
-    UTC
-)
+from datetime import datetime, UTC
 
 from uuid import UUID
 
@@ -28,13 +25,14 @@ from ...models import ActorModel, StageModel
 from ...models.common import ActorStatus, StageStatus
 
 
-async def complete_stage(
-        stage_id: UUID,
-        score: int
-):
+async def complete_stage(stage_id: UUID, score: int):
     async with database_session() as session:
-        stage = await session.scalar(select(StageModel).where(StageModel.id == stage_id))
-        actor = await session.scalar(select(ActorModel).where(ActorModel.id == stage.actor_id))
+        stage = await session.scalar(
+            select(StageModel).where(StageModel.id == stage_id)
+        )
+        actor = await session.scalar(
+            select(ActorModel).where(ActorModel.id == stage.actor_id)
+        )
         stage.status = StageStatus.COMPLETED
         stage.score = score
         stage.completed_at = datetime.now(UTC)

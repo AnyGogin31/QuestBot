@@ -25,7 +25,9 @@ from ...models.common import StageStatus
 
 async def mark_team_arrived(stage_id: UUID):
     async with database_session() as session:
-        stage = await session.scalar(select(StageModel).where(StageModel.id == stage_id))
+        stage = await session.scalar(
+            select(StageModel).where(StageModel.id == stage_id)
+        )
         if stage:
             stage.status = StageStatus.IN_PROGRESS
             await session.flush()

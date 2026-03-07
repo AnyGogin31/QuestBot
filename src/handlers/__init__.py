@@ -20,9 +20,4 @@ from .commander import router as commander_router
 from .start import router as start_router
 
 
-all_handlers = [
-    actor_router,
-    author_router,
-    commander_router,
-    start_router
-]
+all_handlers = [actor_router, author_router, commander_router, start_router]

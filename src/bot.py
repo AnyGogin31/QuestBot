@@ -14,10 +14,7 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram import (
-    Bot,
-    Dispatcher
-)
+from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.redis import RedisStorage
@@ -37,23 +34,17 @@ _logger = get_logger(__name__)
 async def create_bot():
     token = bot_config.token.get_secret_value()
     default = DefaultBotProperties(
-        parse_mode=ParseMode.HTML,
-        link_preview_is_disabled=True
+        parse_mode=ParseMode.HTML, link_preview_is_disabled=True
     )
 
-    return Bot(
-        token=token,
-        default=default
-    )
+    return Bot(token=token, default=default)
 
 
 async def create_dispatcher():
     redis = Redis.from_url(redis_config.url)
     storage = RedisStorage(redis)
 
-    return Dispatcher(
-        storage=storage
-    )
+    return Dispatcher(storage=storage)
 
 
 async def start_bot():

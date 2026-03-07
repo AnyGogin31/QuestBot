@@ -34,7 +34,7 @@ router = Router()
 @router.message(ActorStates.in_game, F.text == "✅ Этап завершён")
 async def stage_complete_prompt(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    stage = await get_active_stage_for_actor(UUID(data['actor_id']))
+    stage = await get_active_stage_for_actor(UUID(data["actor_id"]))
 
     if stage is None:
         await message.answer("❌ Нет активного этапа")
@@ -55,12 +55,13 @@ async def stage_complete_prompt(message: Message, state: FSMContext) -> None:
 async def stage_complete_confirm(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.message.delete()
     data = await state.get_data()
-    actor = await get_actor_by_id(UUID(data['actor_id']))
+    actor = await get_actor_by_id(UUID(data["actor_id"]))
     await set_actor_status(actor.id, ActorStatus.WAITING_SCORE)
     await state.set_state(ActorStates.waiting_score)
 
     from ...database.requests.game import get_game_by_code
-    game = await get_game_by_code(data['game_code'])
+
+    game = await get_game_by_code(data["game_code"])
     min_s = actor.min_score if actor.min_score is not None else game.min_score
     max_s = actor.max_score if actor.max_score is not None else game.max_score
     await callback.message.answer(

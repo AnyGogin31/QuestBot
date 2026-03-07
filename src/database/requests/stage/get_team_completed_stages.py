@@ -27,7 +27,10 @@ async def get_team_completed_stages(team_id: UUID):
     async with database_session() as session:
         rows = await session.execute(
             select(StageModel, ActorModel)
-                .join(ActorModel, StageModel.actor_id == ActorModel.id)
-                .where(StageModel.team_id == team_id, StageModel.status == StageStatus.COMPLETED)
+            .join(ActorModel, StageModel.actor_id == ActorModel.id)
+            .where(
+                StageModel.team_id == team_id,
+                StageModel.status == StageStatus.COMPLETED,
+            )
         )
         return rows.all()

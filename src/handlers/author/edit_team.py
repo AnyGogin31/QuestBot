@@ -33,13 +33,15 @@ router = Router()
 @router.message(AuthorStates.dashboard, F.text == "✏️ Изменить команду")
 async def edit_team_start(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
     teams = await get_teams_in_game(game.id)
     if not teams:
         await message.answer("Нет зарегистрированных команд")
         return
     await state.set_state(EditTeamStates.select_team)
-    await message.answer("Выберите команду для редактирования:", reply_markup=teams_edit(teams))
+    await message.answer(
+        "Выберите команду для редактирования:", reply_markup=teams_edit(teams)
+    )
 
 
 @router.callback_query(F.data.startswith("edit_team:"), EditTeamStates.select_team)
@@ -70,10 +72,13 @@ async def edit_team_save_name(message: Message, state: FSMContext) -> None:
         await message.answer("❌ Название не может быть пустым")
         return
     data = await state.get_data()
-    await update_team(UUID(data['edit_team_id']), name=name)
+    await update_team(UUID(data["edit_team_id"]), name=name)
     await state.set_state(AuthorStates.dashboard)
-    game = await get_game_by_code(data['game_code'])
-    await message.answer(f"✅ Название команды изменено на '{name}'", reply_markup=author_dashboard(game.status))
+    game = await get_game_by_code(data["game_code"])
+    await message.answer(
+        f"✅ Название команды изменено на '{name}'",
+        reply_markup=author_dashboard(game.status),
+    )
 
 
 @router.message(EditTeamStates.waiting_count)
@@ -86,10 +91,13 @@ async def edit_team_save_count(message: Message, state: FSMContext) -> None:
         await message.answer("❌ Введите положительное целое число")
         return
     data = await state.get_data()
-    await update_team(UUID(data['edit_team_id']), member_count=count)
+    await update_team(UUID(data["edit_team_id"]), member_count=count)
     await state.set_state(AuthorStates.dashboard)
-    game = await get_game_by_code(data['game_code'])
-    await message.answer(f"✅ Количество участников изменено на {count}", reply_markup=author_dashboard(game.status))
+    game = await get_game_by_code(data["game_code"])
+    await message.answer(
+        f"✅ Количество участников изменено на {count}",
+        reply_markup=author_dashboard(game.status),
+    )
 
 
 @router.callback_query(F.data == "edit_cancel")
@@ -97,6 +105,8 @@ async def edit_cancel(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     await callback.message.delete()
     await state.set_state(AuthorStates.dashboard)
-    if data.get('game_code'):
-        game = await get_game_by_code(data['game_code'])
-        await callback.message.answer("Редактирование отменено", reply_markup=author_dashboard(game.status))
+    if data.get("game_code"):
+        game = await get_game_by_code(data["game_code"])
+        await callback.message.answer(
+            "Редактирование отменено", reply_markup=author_dashboard(game.status)
+        )

@@ -30,24 +30,26 @@ router = Router()
 
 
 _FIELD_LABELS = {
-    'name': 'имя персонажа',
-    'location': 'локацию',
-    'description': 'описание',
-    'min_score': 'минимальный балл',
-    'max_score': 'максимальный балл',
+    "name": "имя персонажа",
+    "location": "локацию",
+    "description": "описание",
+    "min_score": "минимальный балл",
+    "max_score": "максимальный балл",
 }
 
 
 @router.message(AuthorStates.dashboard, F.text == "✏️ Изменить актёра")
 async def edit_actor_start(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
     actors = await get_actors_in_game(game.id)
     if not actors:
         await message.answer("Нет зарегистрированных актёров")
         return
     await state.set_state(EditActorStates.select_actor)
-    await message.answer("Выберите актёра для редактирования:", reply_markup=actors_edit_kb(actors))
+    await message.answer(
+        "Выберите актёра для редактирования:", reply_markup=actors_edit_kb(actors)
+    )
 
 
 @router.callback_query(F.data.startswith("edit_actor:"), EditActorStates.select_actor)
@@ -65,14 +67,14 @@ async def edit_actor_field_select(callback: CallbackQuery, state: FSMContext) ->
     await callback.message.delete()
     label = _FIELD_LABELS.get(field, field)
     state_map = {
-        'name': EditActorStates.waiting_name,
-        'location': EditActorStates.waiting_location,
-        'description': EditActorStates.waiting_description,
-        'min_score': EditActorStates.waiting_min_score,
-        'max_score': EditActorStates.waiting_max_score,
+        "name": EditActorStates.waiting_name,
+        "location": EditActorStates.waiting_location,
+        "description": EditActorStates.waiting_description,
+        "min_score": EditActorStates.waiting_min_score,
+        "max_score": EditActorStates.waiting_max_score,
     }
     await state.set_state(state_map[field])
-    if field in ('location', 'description'):
+    if field in ("location", "description"):
         await callback.message.answer(f"Введите {label} (или /skip для очистки):")
     else:
         await callback.message.answer(f"Введите {label}:")
@@ -80,9 +82,11 @@ async def edit_actor_field_select(callback: CallbackQuery, state: FSMContext) ->
 
 async def _finish_edit(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
     await state.set_state(AuthorStates.dashboard)
-    await message.answer("✅ Данные актёра обновлены", reply_markup=author_dashboard(game.status))
+    await message.answer(
+        "✅ Данные актёра обновлены", reply_markup=author_dashboard(game.status)
+    )
 
 
 @router.message(EditActorStates.waiting_name)
@@ -92,23 +96,23 @@ async def edit_actor_name(message: Message, state: FSMContext) -> None:
         await message.answer("❌ Имя не может быть пустым")
         return
     data = await state.get_data()
-    await update_actor(UUID(data['edit_actor_id']), name=name)
+    await update_actor(UUID(data["edit_actor_id"]), name=name)
     await _finish_edit(message, state)
 
 
 @router.message(EditActorStates.waiting_location)
 async def edit_actor_location(message: Message, state: FSMContext) -> None:
-    loc = None if message.text.strip() == '/skip' else message.text.strip()
+    loc = None if message.text.strip() == "/skip" else message.text.strip()
     data = await state.get_data()
-    await update_actor(UUID(data['edit_actor_id']), location=loc)
+    await update_actor(UUID(data["edit_actor_id"]), location=loc)
     await _finish_edit(message, state)
 
 
 @router.message(EditActorStates.waiting_description)
 async def edit_actor_description(message: Message, state: FSMContext) -> None:
-    desc = None if message.text.strip() == '/skip' else message.text.strip()
+    desc = None if message.text.strip() == "/skip" else message.text.strip()
     data = await state.get_data()
-    await update_actor(UUID(data['edit_actor_id']), description=desc)
+    await update_actor(UUID(data["edit_actor_id"]), description=desc)
     await _finish_edit(message, state)
 
 
@@ -120,8 +124,8 @@ async def edit_actor_min_score(message: Message, state: FSMContext) -> None:
         await message.answer("❌ Введите целое число")
         return
     data = await state.get_data()
-    actor = await get_actor_by_id(UUID(data['edit_actor_id']))
-    game = await get_game_by_code(data['game_code'])
+    actor = await get_actor_by_id(UUID(data["edit_actor_id"]))
+    game = await get_game_by_code(data["game_code"])
     max_s = actor.max_score if actor.max_score is not None else game.max_score
     if val >= max_s:
         await message.answer(f"❌ Минимум должен быть меньше максимума ({max_s})")
@@ -138,8 +142,8 @@ async def edit_actor_max_score(message: Message, state: FSMContext) -> None:
         await message.answer("❌ Введите целое число")
         return
     data = await state.get_data()
-    actor = await get_actor_by_id(UUID(data['edit_actor_id']))
-    game = await get_game_by_code(data['game_code'])
+    actor = await get_actor_by_id(UUID(data["edit_actor_id"]))
+    game = await get_game_by_code(data["game_code"])
     min_s = actor.min_score if actor.min_score is not None else game.min_score
     if val <= min_s:
         await message.answer(f"❌ Максимум должен быть больше минимума ({min_s})")

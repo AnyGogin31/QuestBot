@@ -32,7 +32,7 @@ router = Router()
 @router.message(ActorStates.lobby, F.text == "✅ Готов к игре")
 async def ready(message: Message, state: FSMContext):
     data = await state.get_data()
-    await set_actor_status(UUID(data['actor_id']), ActorStatus.FREE)
+    await set_actor_status(UUID(data["actor_id"]), ActorStatus.FREE)
     await state.set_state(ActorStates.in_game)
     await message.answer(
         "✅ <b>Готов к игре!</b>\n\nОжидайте назначения команды от организатора",

@@ -33,5 +33,5 @@ router.include_routers(
     stage_complete_router,
     score_entry_router,
     ready_next_router,
-    teams_list_router
+    teams_list_router,
 )

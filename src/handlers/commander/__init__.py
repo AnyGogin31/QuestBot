@@ -24,8 +24,5 @@ from .my_results import router as my_results_router
 
 router = Router()
 router.include_routers(
-    register_router,
-    ready_router,
-    current_stage_router,
-    my_results_router
+    register_router, ready_router, current_stage_router, my_results_router
 )

@@ -19,6 +19,6 @@ from enum import StrEnum, unique
 
 @unique
 class ActorStatus(StrEnum):
-    FREE = 'free'
-    BUSY = 'busy'
-    WAITING_SCORE = 'waiting_score'
+    FREE = "free"
+    BUSY = "busy"
+    WAITING_SCORE = "waiting_score"

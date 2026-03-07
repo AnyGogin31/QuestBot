@@ -26,9 +26,7 @@ _UNSET = object()
 
 
 async def update_team(
-        team_id: UUID,
-        name: str | None = _UNSET,
-        member_count: int | None = _UNSET
+    team_id: UUID, name: str | None = _UNSET, member_count: int | None = _UNSET
 ):
     async with database_session() as session:
         team = await session.scalar(select(TeamModel).where(TeamModel.id == team_id))

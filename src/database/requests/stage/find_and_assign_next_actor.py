@@ -23,26 +23,21 @@ from ...models import ActorModel, StageModel
 from ...models.common import ActorStatus
 
 
-async def find_and_assign_next_actor(
-        game_id: UUID,
-        team_id: UUID
-):
+async def find_and_assign_next_actor(game_id: UUID, team_id: UUID):
     async with database_session() as session:
         visited_sq = select(StageModel.actor_id).where(StageModel.team_id == team_id)
         actor = await session.scalar(
-            select(ActorModel).where(
-                    ActorModel.game_id == game_id,
-                    ActorModel.status == ActorStatus.FREE,
-                    ActorModel.id.not_in(visited_sq)
-            ).limit(1)
+            select(ActorModel)
+            .where(
+                ActorModel.game_id == game_id,
+                ActorModel.status == ActorStatus.FREE,
+                ActorModel.id.not_in(visited_sq),
+            )
+            .limit(1)
         )
         if actor is None:
             return None
-        stage = StageModel(
-            game_id=game_id,
-            team_id=team_id,
-            actor_id=actor.id
-        )
+        stage = StageModel(game_id=game_id, team_id=team_id, actor_id=actor.id)
         actor.status = ActorStatus.BUSY
         session.add(stage)
         await session.flush()

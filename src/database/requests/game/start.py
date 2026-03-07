@@ -14,10 +14,7 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import (
-    datetime,
-    UTC
-)
+from datetime import datetime, UTC
 
 from sqlalchemy import select
 
@@ -28,7 +25,9 @@ from ...models.common import GameStatus
 
 async def start_game(game_code: str):
     async with database_session() as session:
-        game = await session.scalar(select(GameModel).where(GameModel.code == game_code))
+        game = await session.scalar(
+            select(GameModel).where(GameModel.code == game_code)
+        )
         if game is None:
             return None
         game.status = GameStatus.RUNNING

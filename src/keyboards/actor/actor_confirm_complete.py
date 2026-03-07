@@ -21,7 +21,10 @@ from html import escape
 
 def actor_confirm_complete(team_name: str):
     builder = InlineKeyboardBuilder()
-    builder.button(text=f"✅ Да, завершить этап с '{escape(team_name)}'", callback_data="actor_confirm_complete")
+    builder.button(
+        text=f"✅ Да, завершить этап с '{escape(team_name)}'",
+        callback_data="actor_confirm_complete",
+    )
     builder.button(text="❌ Нет, вернуться", callback_data="actor_cancel_complete")
     builder.adjust(1)
     return builder.as_markup()

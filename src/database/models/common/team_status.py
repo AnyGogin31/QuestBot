@@ -19,7 +19,7 @@ from enum import StrEnum, unique
 
 @unique
 class TeamStatus(StrEnum):
-    IDLE = 'idle'
-    EN_ROUTE = 'en_route'
-    AT_ACTOR = 'at_actor'
-    FINISHED = 'finished'
+    IDLE = "idle"
+    EN_ROUTE = "en_route"
+    AT_ACTOR = "at_actor"
+    FINISHED = "finished"

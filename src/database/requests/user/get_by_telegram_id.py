@@ -22,4 +22,6 @@ from ...models import UserModel
 
 async def get_user_by_telegram_id(telegram_id: int):
     async with database_session() as session:
-        return await session.scalar(select(UserModel).where(UserModel.telegram_id == telegram_id))
+        return await session.scalar(
+            select(UserModel).where(UserModel.telegram_id == telegram_id)
+        )

@@ -26,9 +26,11 @@ from ...models.common import StageStatus
 async def count_completed_stages(team_id: UUID):
     async with database_session() as session:
         result = await session.scalar(
-            select(func.count()).select_from(StageModel).where(
+            select(func.count())
+            .select_from(StageModel)
+            .where(
                 StageModel.team_id == team_id,
-                StageModel.status == StageStatus.COMPLETED
+                StageModel.status == StageStatus.COMPLETED,
             )
         )
         return result or 0

@@ -26,7 +26,7 @@ async def get_games_by_author(author_id: UUID):
     async with database_session() as session:
         result = await session.execute(
             select(GameModel)
-                .where(GameModel.author_id == author_id)
-                .order_by(GameModel.created_at.desc())
+            .where(GameModel.author_id == author_id)
+            .order_by(GameModel.created_at.desc())
         )
         return list(result.scalars().all())

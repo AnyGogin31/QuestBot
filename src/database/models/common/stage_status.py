@@ -19,7 +19,7 @@ from enum import StrEnum, unique
 
 @unique
 class StageStatus(StrEnum):
-    ASSIGNED = 'assigned'
-    IN_PROGRESS = 'in_progress'
-    COMPLETED = 'completed'
-    SKIPPED = 'skipped'
+    ASSIGNED = "assigned"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    SKIPPED = "skipped"

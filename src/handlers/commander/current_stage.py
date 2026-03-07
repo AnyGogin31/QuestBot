@@ -33,12 +33,14 @@ router = Router()
 @router.message(CommanderStates.in_game, F.text == "📍 Текущий этап")
 async def current_stage(message: Message, state: FSMContext):
     data = await state.get_data()
-    team_id = UUID(data['team_id'])
+    team_id = UUID(data["team_id"])
     stage = await get_active_stage_for_team(team_id)
 
     if not stage:
         done = await count_completed_stages(team_id)
-        await message.answer(f"⏳ Ожидание следующего актёра...\nПройдено этапов: {done}")
+        await message.answer(
+            f"⏳ Ожидание следующего актёра...\nПройдено этапов: {done}"
+        )
         return
 
     actor = await get_actor_by_id(stage.actor_id)

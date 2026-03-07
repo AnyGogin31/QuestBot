@@ -30,7 +30,7 @@ router = Router()
 @router.message(CommanderStates.finished, F.text == "🏆 Мои результаты")
 async def my_results(message: Message, state: FSMContext):
     data = await state.get_data()
-    stages = await get_team_completed_stages(UUID(data['team_id']))
+    stages = await get_team_completed_stages(UUID(data["team_id"]))
 
     if not stages:
         await message.answer("Результатов пока нет")

@@ -16,11 +16,7 @@
 
 from contextlib import asynccontextmanager
 
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine
-)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from ..configs import database_config
 from ..utils.logging import get_logger
@@ -29,16 +25,12 @@ from ..utils.logging import get_logger
 _logger = get_logger(__name__)
 
 
-engine = create_async_engine(
-    url=database_config.url,
-    echo=False
-)
+engine = create_async_engine(url=database_config.url, echo=False)
 
 session_factory = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False
+    engine, class_=AsyncSession, expire_on_commit=False
 )
+
 
 @asynccontextmanager
 async def database_session():

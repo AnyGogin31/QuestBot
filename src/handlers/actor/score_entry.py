@@ -20,10 +20,18 @@ from aiogram.types import Message
 
 from uuid import UUID
 
-from ..notification import notify_team_new_actor, notify_actor_incoming_team, notify_team_finished
+from ..notification import (
+    notify_team_new_actor,
+    notify_actor_incoming_team,
+    notify_team_finished,
+)
 from ...database.requests.actor import get_actor_by_id
 from ...database.requests.game import get_game_by_code
-from ...database.requests.stage import complete_stage, find_and_assign_next_actor, has_unvisited_actors
+from ...database.requests.stage import (
+    complete_stage,
+    find_and_assign_next_actor,
+    has_unvisited_actors,
+)
 from ...database.requests.team import get_team_by_id, mark_team_finished
 from ...keyboards.actor import actor_in_game
 from ...states import ActorStates
@@ -35,8 +43,8 @@ router = Router()
 @router.message(ActorStates.waiting_score)
 async def enter_score(message: Message, state: FSMContext, bot: Bot) -> None:
     data = await state.get_data()
-    actor = await get_actor_by_id(UUID(data['actor_id']))
-    game = await get_game_by_code(data['game_code'])
+    actor = await get_actor_by_id(UUID(data["actor_id"]))
+    game = await get_game_by_code(data["game_code"])
 
     min_s = actor.min_score if actor.min_score is not None else game.min_score
     max_s = actor.max_score if actor.max_score is not None else game.max_score
@@ -49,7 +57,7 @@ async def enter_score(message: Message, state: FSMContext, bot: Bot) -> None:
         await message.answer(f"❌ Введите целое число от {min_s} до {max_s}")
         return
 
-    team_id = await complete_stage(UUID(data['stage_id']), score)
+    team_id = await complete_stage(UUID(data["stage_id"]), score)
     team = await get_team_by_id(team_id)
     next_actor = await find_and_assign_next_actor(game.id, team.id)
 

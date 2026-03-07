@@ -34,7 +34,7 @@ router = Router()
 @router.message(ActorStates.in_game, F.text == "➡️ Готов к следующей команде")
 async def ready_next(message: Message, state: FSMContext, bot: Bot) -> None:
     data = await state.get_data()
-    actor = await get_actor_by_id(UUID(data['actor_id']))
+    actor = await get_actor_by_id(UUID(data["actor_id"]))
 
     if actor.status == ActorStatus.BUSY:
         await message.answer("⚠️ Вы сейчас обслуживаете команду. Сначала завершите этап")

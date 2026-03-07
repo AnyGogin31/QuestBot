@@ -14,17 +14,11 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from pydantic_settings import (
-    BaseSettings,
-    SettingsConfigDict
-)
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 
 class RedisSettings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_prefix="REDIS_",
-        case_sensitive=False
-    )
+    model_config = SettingsConfigDict(env_prefix="REDIS_", case_sensitive=False)
 
     url: str = Field(alias="REDIS_URL")

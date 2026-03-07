@@ -30,13 +30,15 @@ router = Router()
 @router.message(AuthorStates.main, F.text == "🎮 Создать новую игру")
 async def to_create_game(message: Message, state: FSMContext):
     await state.set_state(CreateGameStates.waiting_title)
-    await message.answer("🎮 <b>Создание игры</b>\n\nВведите название игры (или /skip):")
+    await message.answer(
+        "🎮 <b>Создание игры</b>\n\nВведите название игры (или /skip):"
+    )
 
 
 @router.message(AuthorStates.main, F.text == "📋 Мои игры")
 async def my_games(message: Message, state: FSMContext):
     data = await state.get_data()
-    games = await get_games_by_author(UUID(data['user_id']))
+    games = await get_games_by_author(UUID(data["user_id"]))
     if not games:
         await message.answer("У вас пока нет игр")
         return

@@ -42,7 +42,7 @@ async def step_team_name(message: Message, state: FSMContext):
 
 @router.message(JoinCommanderStates.waiting_member_count)
 async def step_member_count(message: Message, state: FSMContext):
-    if message.text.strip() == '/skip':
+    if message.text.strip() == "/skip":
         count = 1
     else:
         try:
@@ -54,19 +54,26 @@ async def step_member_count(message: Message, state: FSMContext):
             return
 
     data = await state.get_data()
-    user_id = UUID(data['user_id'])
-    game_id = UUID(data['game_id'])
+    user_id = UUID(data["user_id"])
+    game_id = UUID(data["game_id"])
 
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
     existing = await get_team_by_commander(user_id)
 
     if existing and existing.game_id == game_id:
         await state.set_state(CommanderStates.lobby)
         await state.update_data(team_id=str(existing.id))
-        await message.answer("ℹ️ Вы уже зарегистрированы в этой игре", reply_markup=commander_lobby())
+        await message.answer(
+            "ℹ️ Вы уже зарегистрированы в этой игре", reply_markup=commander_lobby()
+        )
         return
 
-    team = await create_team(game_id=game_id, commander_id=user_id, name=data['team_name'], member_count=count)
+    team = await create_team(
+        game_id=game_id,
+        commander_id=user_id,
+        name=data["team_name"],
+        member_count=count,
+    )
     await state.set_state(CommanderStates.lobby)
     await state.update_data(team_id=str(team.id))
     await message.answer(

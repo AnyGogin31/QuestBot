@@ -22,16 +22,12 @@ from ... import database_session
 from ...models import ActorModel, StageModel
 
 
-async def has_unvisited_actors(
-        game_id: UUID,
-        team_id: UUID
-):
+async def has_unvisited_actors(game_id: UUID, team_id: UUID):
     async with database_session() as session:
         visited_sq = select(StageModel.actor_id).where(StageModel.team_id == team_id)
         count = await session.scalar(
-            select(func.count()).select_from(ActorModel).where(
-                ActorModel.game_id == game_id,
-                ActorModel.id.not_in(visited_sq)
-            )
+            select(func.count())
+            .select_from(ActorModel)
+            .where(ActorModel.game_id == game_id, ActorModel.id.not_in(visited_sq))
         )
         return (count or 0) > 0

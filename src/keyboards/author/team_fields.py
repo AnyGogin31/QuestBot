@@ -20,7 +20,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def team_fields(team_id):
     builder = InlineKeyboardBuilder()
     builder.button(text="📝 Название", callback_data=f"team_field:{team_id}:name")
-    builder.button(text="👤 Кол-во участников", callback_data=f"team_field:{team_id}:count")
+    builder.button(
+        text="👤 Кол-во участников", callback_data=f"team_field:{team_id}:count"
+    )
     builder.button(text="❌ Отмена", callback_data="edit_cancel")
     builder.adjust(1)
     return builder.as_markup()

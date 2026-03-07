@@ -28,6 +28,6 @@ async def get_active_stage_for_team(team_id: UUID):
         return await session.scalar(
             select(StageModel).where(
                 StageModel.team_id == team_id,
-                StageModel.status.in_([StageStatus.ASSIGNED, StageStatus.IN_PROGRESS])
+                StageModel.status.in_([StageStatus.ASSIGNED, StageStatus.IN_PROGRESS]),
             )
         )

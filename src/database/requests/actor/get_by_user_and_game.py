@@ -22,14 +22,10 @@ from ... import database_session
 from ...models import ActorModel
 
 
-async def get_actor_by_user_and_game(
-        user_id: UUID,
-        game_id: UUID
-):
+async def get_actor_by_user_and_game(user_id: UUID, game_id: UUID):
     async with database_session() as session:
         return await session.scalar(
             select(ActorModel).where(
-                ActorModel.user_id == user_id,
-                ActorModel.game_id == game_id
+                ActorModel.user_id == user_id, ActorModel.game_id == game_id
             )
         )

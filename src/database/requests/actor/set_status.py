@@ -23,12 +23,11 @@ from ...models import ActorModel
 from ...models.common import ActorStatus
 
 
-async def set_actor_status(
-        actor_id: UUID,
-        status: ActorStatus
-):
+async def set_actor_status(actor_id: UUID, status: ActorStatus):
     async with database_session() as session:
-        actor = await session.scalar(select(ActorModel).where(ActorModel.id == actor_id))
+        actor = await session.scalar(
+            select(ActorModel).where(ActorModel.id == actor_id)
+        )
         if actor:
             actor.status = status
             await session.flush()

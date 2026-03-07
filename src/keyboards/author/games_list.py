@@ -27,6 +27,9 @@ def games_list(games: List[GameModel]):
     builder = InlineKeyboardBuilder()
     for game in games:
         title = game.title or f"Игра {game.code}"
-        builder.button(text=f"{escape(title)} [{game.status}]", callback_data=f"open_game:{game.code}")
+        builder.button(
+            text=f"{escape(title)} [{game.status}]",
+            callback_data=f"open_game:{game.code}",
+        )
     builder.adjust(1)
     return builder.as_markup()

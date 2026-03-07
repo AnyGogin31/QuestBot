@@ -23,6 +23,7 @@ _logger = get_logger(__name__)
 def configure_uvloop() -> None:
     try:
         import uvloop
+
         uvloop.install()
         _logger.info("uvloop успешно активирован")
     except ImportError:

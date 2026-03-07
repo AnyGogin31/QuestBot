@@ -27,8 +27,7 @@ async def get_ready_teams(game_id: UUID):
     async with database_session() as session:
         result = await session.execute(
             select(TeamModel).where(
-                TeamModel.game_id == game_id,
-                TeamModel.status == TeamStatus.EN_ROUTE
+                TeamModel.game_id == game_id, TeamModel.status == TeamStatus.EN_ROUTE
             )
         )
         return list(result.scalars().all())

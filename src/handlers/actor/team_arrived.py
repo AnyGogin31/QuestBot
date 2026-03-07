@@ -32,7 +32,7 @@ router = Router()
 @router.message(ActorStates.in_game, F.text == "🏁 Команда прибыла")
 async def team_arrived(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    stage = await get_active_stage_for_actor(UUID(data['actor_id']))
+    stage = await get_active_stage_for_actor(UUID(data["actor_id"]))
 
     if stage is None:
         await message.answer("⏳ Вам ещё не назначена команда. Ожидайте")

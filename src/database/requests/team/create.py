@@ -21,17 +21,14 @@ from ...models import TeamModel
 
 
 async def create_team(
-        game_id: UUID,
-        commander_id: UUID,
-        name: str,
-        member_count: int = 1
+    game_id: UUID, commander_id: UUID, name: str, member_count: int = 1
 ):
     async with database_session() as session:
         team = TeamModel(
             game_id=game_id,
             commander_id=commander_id,
             name=name,
-            member_count=member_count
+            member_count=member_count,
         )
         session.add(team)
         await session.flush()

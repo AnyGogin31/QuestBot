@@ -21,19 +21,21 @@ from ...models import UserModel
 
 
 async def get_or_create_user(
-        telegram_id: int,
-        username: str | None = None,
-        first_name: str | None = None,
-        last_name: str | None = None
+    telegram_id: int,
+    username: str | None = None,
+    first_name: str | None = None,
+    last_name: str | None = None,
 ):
     async with database_session() as session:
-        user = await session.scalar(select(UserModel).where(UserModel.telegram_id == telegram_id))
+        user = await session.scalar(
+            select(UserModel).where(UserModel.telegram_id == telegram_id)
+        )
         if user is None:
             user = UserModel(
                 telegram_id=telegram_id,
                 username=username,
                 first_name=first_name,
-                last_name=last_name
+                last_name=last_name,
             )
             session.add(user)
         else:

@@ -23,18 +23,12 @@ from ...models import ActorModel, StageModel
 from ...models.common import ActorStatus
 
 
-async def assign_actor_to_team(
-        game_id: UUID,
-        team_id: UUID,
-        actor_id: UUID
-):
+async def assign_actor_to_team(game_id: UUID, team_id: UUID, actor_id: UUID):
     async with database_session() as session:
-        actor = await session.scalar(select(ActorModel).where(ActorModel.id == actor_id))
-        stage = StageModel(
-            game_id=game_id,
-            team_id=team_id,
-            actor_id=actor_id
+        actor = await session.scalar(
+            select(ActorModel).where(ActorModel.id == actor_id)
         )
+        stage = StageModel(game_id=game_id, team_id=team_id, actor_id=actor_id)
         actor.status = ActorStatus.BUSY
         session.add(stage)
         await session.flush()

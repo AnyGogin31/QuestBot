@@ -41,7 +41,7 @@ async def step_name(message: Message, state: FSMContext) -> None:
 
 @router.message(JoinActorStates.waiting_location)
 async def step_location(message: Message, state: FSMContext) -> None:
-    loc = None if message.text.strip() == '/skip' else message.text.strip()
+    loc = None if message.text.strip() == "/skip" else message.text.strip()
     await state.update_data(location=loc)
     await state.set_state(JoinActorStates.waiting_description)
     await message.answer("📝 Добавьте описание персонажа для команд (или /skip):")
@@ -49,23 +49,28 @@ async def step_location(message: Message, state: FSMContext) -> None:
 
 @router.message(JoinActorStates.waiting_description)
 async def step_description(message: Message, state: FSMContext) -> None:
-    desc = None if message.text.strip() == '/skip' else message.text.strip()
+    desc = None if message.text.strip() == "/skip" else message.text.strip()
     data = await state.get_data()
-    user_id = UUID(data['user_id'])
-    game_id = UUID(data['game_id'])
+    user_id = UUID(data["user_id"])
+    game_id = UUID(data["game_id"])
 
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
     existing = await get_actor_by_user_and_game(user_id, game_id)
 
     if existing:
         await state.set_state(ActorStates.lobby)
         await state.update_data(actor_id=str(existing.id))
-        await message.answer("ℹ️ Вы уже зарегистрированы как актёр", reply_markup=actor_lobby())
+        await message.answer(
+            "ℹ️ Вы уже зарегистрированы как актёр", reply_markup=actor_lobby()
+        )
         return
 
     actor = await create_actor(
-        game_id=game_id, user_id=user_id,
-        name=data['character_name'], location=data.get('location'), description=desc,
+        game_id=game_id,
+        user_id=user_id,
+        name=data["character_name"],
+        location=data.get("location"),
+        description=desc,
     )
     await state.set_state(ActorStates.lobby)
     await state.update_data(actor_id=str(actor.id))

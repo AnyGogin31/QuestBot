@@ -44,7 +44,7 @@ _ACTOR_STATUS_LABELS = {
 @router.message(AuthorStates.dashboard, F.text == "👥 Участники")
 async def participants(message: Message, state: FSMContext):
     data = await state.get_data()
-    game = await get_game_by_code(data['game_code'])
+    game = await get_game_by_code(data["game_code"])
     teams = await get_teams_in_game(game.id)
     actors = await get_actors_in_game(game.id)
 

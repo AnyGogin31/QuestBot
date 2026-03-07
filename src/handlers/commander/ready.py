@@ -31,7 +31,7 @@ router = Router()
 @router.message(CommanderStates.lobby, F.text == "✅ Готов к игре")
 async def ready(message: Message, state: FSMContext):
     data = await state.get_data()
-    await mark_team_ready(UUID(data['team_id']))
+    await mark_team_ready(UUID(data["team_id"]))
     await message.answer(
         "✅ <b>Отмечено как 'Готов'!</b>\nОжидайте старта от организатора",
         reply_markup=commander_lobby(),

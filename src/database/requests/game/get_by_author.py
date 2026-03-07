@@ -14,6 +14,19 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .get_by_id import get_user_by_id
-from .get_by_telegram_id import get_user_by_telegram_id
-from .get_or_create import get_or_create_user
+from uuid import UUID
+
+from sqlalchemy import select
+
+from ... import database_session
+from ...models import GameModel
+
+
+async def get_games_by_author(author_id: UUID):
+    async with database_session() as session:
+        result = await session.execute(
+            select(GameModel)
+                .where(GameModel.author_id == author_id)
+                .order_by(GameModel.created_at.desc())
+        )
+        return list(result.scalars().all())

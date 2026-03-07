@@ -14,21 +14,30 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from datetime import (
+    datetime,
+    UTC
+)
+
 from uuid import UUID
 
 from sqlalchemy import select
 
 from ... import database_session
-from ...models import GameModel
+from ...models import ActorModel, StageModel
+from ...models.common import ActorStatus, StageStatus
 
 
-async def get_games_by_author(
-        author_id: UUID
+async def complete_stage(
+        stage_id: UUID,
+        score: int
 ):
     async with database_session() as session:
-        result = await session.execute(
-            select(GameModel)
-                .where(GameModel.author_id == author_id)
-                .order_by(GameModel.created_at.desc())
-        )
-        return list(result.scalars().all())
+        stage = await session.scalar(select(StageModel).where(StageModel.id == stage_id))
+        actor = await session.scalar(select(ActorModel).where(ActorModel.id == stage.actor_id))
+        stage.status = StageStatus.COMPLETED
+        stage.score = score
+        stage.completed_at = datetime.now(UTC)
+        actor.status = ActorStatus.WAITING_SCORE
+        await session.flush()
+        return stage.team_id

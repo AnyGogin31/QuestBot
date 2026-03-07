@@ -19,17 +19,9 @@ from uuid import UUID
 from sqlalchemy import select
 
 from ... import database_session
-from ...models import StageModel
-from ...models.common import StageStatus
+from ...models import ActorModel
 
 
-async def get_active_stage_for_actor(
-        actor_id: UUID
-):
+async def get_actor_by_id(actor_id: UUID):
     async with database_session() as session:
-        return await session.scalar(
-            select(StageModel).where(
-                StageModel.actor_id == actor_id,
-                StageModel.status.in_([StageStatus.ASSIGNED, StageStatus.IN_PROGRESS])
-            )
-        )
+        return await session.scalar(select(ActorModel).where(ActorModel.id == actor_id))

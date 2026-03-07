@@ -14,12 +14,15 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .assign_actor_to_team import assign_actor_to_team
-from .complete_stage import complete_stage
-from .find_free_unvisited_actor import find_free_unvisited_actor
-from .find_waiting_team import find_waiting_team
-from .get_active_stage_for_actor import get_active_stage_for_actor
-from .get_active_stage_for_team import get_active_stage_for_team
+from .assign_to_team import assign_actor_to_team
+from .complete import complete_stage
+from .find_and_assign_next_actor import find_and_assign_next_actor
+from .find_and_assign_waiting_team import find_and_assign_waiting_team
+from .get_active_for_actor import get_active_stage_for_actor
+from .get_active_for_team import get_active_stage_for_team
 from .get_game_results import get_game_results
+from .get_game_stats import get_game_stats
+from .get_team_completed_stages import get_team_completed_stages
 from .has_unvisited_actors import has_unvisited_actors
-from .mark_team_arrived import mark_team_arrived
+from .mark_arrived import mark_team_arrived
+from .set_actor_free import create_actor

@@ -15,9 +15,11 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from .count_completed_stages import count_completed_stages
-from .create_team import create_team
-from .get_ready_teams import get_ready_teams
-from .get_team_by_commander import get_team_by_commander
-from .get_team_by_id import get_team_by_id
-from .get_teams_in_game import get_teams_in_game
-from .mark_team_ready import mark_team_ready
+from .create import create_team
+from .get_all_in_game import get_teams_in_game
+from .get_by_commander import get_team_by_commander
+from .get_by_id import get_team_by_id
+from .get_ready_in_game import get_ready_teams
+from .mark_finished import mark_team_finished
+from .mark_ready import mark_team_ready
+from .update import update_team

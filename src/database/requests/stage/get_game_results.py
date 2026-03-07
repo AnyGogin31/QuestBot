@@ -23,27 +23,21 @@ from ...models import ActorModel, TeamModel, StageModel
 from ...models.common import StageStatus
 
 
-async def get_game_results(
-        game_id: UUID
-):
+async def get_game_results(game_id: UUID):
     async with database_session() as session:
-        teams_result = await session.execute(
+        teams = list((await session.execute(
             select(TeamModel).where(TeamModel.game_id == game_id)
-        )
-        teams = teams_result.scalars().all()
+        )).scalars().all())
 
         results = []
         for team in teams:
-            rows = await session.execute(
+            rows = (await session.execute(
                 select(StageModel, ActorModel)
                     .join(ActorModel, StageModel.actor_id == ActorModel.id)
-                    .where(
-                        StageModel.team_id == team.id,
-                        StageModel.status == StageStatus.COMPLETED
-                    )
-            )
-            stages = rows.all()
-            total = sum((row.StageModel.score or 0) for row in stages)
-            results.append({'team': team, 'stages': stages, 'total': total})
-        results.sort(key=lambda r: r['total'], reverse=True)
-        return results
+                    .where(StageModel.team_id == team.id, StageModel.status == StageStatus.COMPLETED)
+            )).all()
+            total = sum((r.StageModel.score or 0) for r in rows)
+            results.append({'team': team, 'stages': rows, 'total': total})
+
+    results.sort(key=lambda r: r['total'], reverse=True)
+    return results

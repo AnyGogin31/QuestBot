@@ -20,13 +20,33 @@ from sqlalchemy import select
 
 from ... import database_session
 from ...models import ActorModel
+from ...models.common import ActorStatus
 
 
-async def get_actors_in_game(
-        game_id: UUID
+_UNSET = object()
+
+
+async def update_actor(
+        actor_id: UUID,
+        name: object = _UNSET,
+        location: object = _UNSET,
+        description: object = _UNSET,
+        min_score: object = _UNSET,
+        max_score: object = _UNSET,
 ):
     async with database_session() as session:
-        result = await session.execute(
-            select(ActorModel).where(ActorModel.game_id == game_id)
-        )
-        return list(result.scalars().all())
+        actor = await session.scalar(select(ActorModel).where(ActorModel.id == actor_id))
+        if actor is None:
+            return None
+        if name is not _UNSET:
+            actor.name = name
+        if location is not _UNSET:
+            actor.location = location
+        if description is not _UNSET:
+            actor.description = description
+        if min_score is not _UNSET:
+            actor.min_score = min_score
+        if max_score is not _UNSET:
+            actor.max_score = max_score
+        await session.flush()
+        return actor

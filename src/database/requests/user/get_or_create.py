@@ -14,16 +14,31 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from uuid import UUID
-
 from sqlalchemy import select
 
 from ... import database_session
 from ...models import UserModel
 
 
-async def get_user_by_id(
-        user_id: UUID
+async def get_or_create_user(
+        telegram_id: int,
+        username: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None
 ):
     async with database_session() as session:
-        return await session.scalar(select(UserModel).where(UserModel.id == user_id))
+        user = await session.scalar(select(UserModel).where(UserModel.telegram_id == telegram_id))
+        if user is None:
+            user = UserModel(
+                telegram_id=telegram_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name
+            )
+            session.add(user)
+        else:
+            user.username = username
+            user.first_name = first_name
+            user.last_name = last_name
+        await session.flush()
+        return user

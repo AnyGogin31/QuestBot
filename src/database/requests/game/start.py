@@ -14,6 +14,24 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .get_by_id import get_user_by_id
-from .get_by_telegram_id import get_user_by_telegram_id
-from .get_or_create import get_or_create_user
+from datetime import (
+    datetime,
+    UTC
+)
+
+from sqlalchemy import select
+
+from ... import database_session
+from ...models import GameModel
+from ...models.common import GameStatus
+
+
+async def start_game(game_code: str):
+    async with database_session() as session:
+        game = await session.scalar(select(GameModel).where(GameModel.code == game_code))
+        if game is None:
+            return None
+        game.status = GameStatus.RUNNING
+        game.started_at = datetime.now(UTC)
+        await session.flush()
+        return game

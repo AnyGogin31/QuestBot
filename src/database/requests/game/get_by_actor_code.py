@@ -14,22 +14,14 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import (
-    datetime,
-    UTC
-)
+from sqlalchemy import select
 
 from ... import database_session
-from ...models import StageModel
-from ...models.common import StageStatus
+from ...models import GameModel
 
 
-async def complete_stage(
-        stage: StageModel,
-        score: int
-):
+async def get_game_by_actor_code(actor_code: str):
     async with database_session() as session:
-        stage.status = StageStatus.COMPLETED
-        stage.score = score
-        stage.completed_at = datetime.now(UTC)
-        await session.flush()
+        return await session.scalar(
+            select(GameModel).where(GameModel.actor_code == actor_code.upper())
+        )

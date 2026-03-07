@@ -14,14 +14,29 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from uuid import UUID
+
+from sqlalchemy import select
+
 from ... import database_session
-from ...models import StageModel
-from ...models.common import StageStatus
+from ...models import TeamModel
 
 
-async def mark_team_arrived(
-        stage: StageModel
+_UNSET = object()
+
+
+async def update_team(
+        team_id: UUID,
+        name: str | None = _UNSET,
+        member_count: int | None = _UNSET
 ):
     async with database_session() as session:
-        stage.status = StageStatus.IN_PROGRESS
+        team = await session.scalar(select(TeamModel).where(TeamModel.id == team_id))
+        if team is None:
+            return None
+        if name is not _UNSET:
+            team.name = name
+        if member_count is not _UNSET:
+            team.member_count = member_count
         await session.flush()
+        return team

@@ -14,6 +14,20 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .get_by_id import get_user_by_id
-from .get_by_telegram_id import get_user_by_telegram_id
-from .get_or_create import get_or_create_user
+from uuid import UUID
+
+from sqlalchemy import select
+
+from ... import database_session
+from ...models import StageModel
+from ...models.common import StageStatus
+
+
+async def get_active_stage_for_actor(actor_id: UUID):
+    async with database_session() as session:
+        return await session.scalar(
+            select(StageModel).where(
+                StageModel.actor_id == actor_id,
+                StageModel.status.in_([StageStatus.ASSIGNED, StageStatus.IN_PROGRESS])
+            )
+        )

@@ -16,28 +16,18 @@
 
 from uuid import UUID
 
+from sqlalchemy import select
+
 from ... import database_session
-from ...models import ActorModel
-from ...models.common import ActorStatus
+from ...models import ActorModel, StageModel
+from ...models.common import StageStatus
 
 
-async def create_actor(
-        game_id: UUID,
-        user_id: UUID,
-        name: str,
-        location: str | None = None,
-        description: str | None = None
-):
-    actor = ActorModel(
-        game_id=game_id,
-        user_id=user_id,
-        name=name,
-        location=location,
-        description=description,
-        status=ActorStatus.FREE
-    )
-
+async def get_team_completed_stages(team_id: UUID):
     async with database_session() as session:
-        session.add(actor)
-        await session.flush()
-        return actor
+        rows = await session.execute(
+            select(StageModel, ActorModel)
+                .join(ActorModel, StageModel.actor_id == ActorModel.id)
+                .where(StageModel.team_id == team_id, StageModel.status == StageStatus.COMPLETED)
+        )
+        return rows.all()

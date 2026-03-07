@@ -23,9 +23,7 @@ from ...models import StageModel
 from ...models.common import StageStatus
 
 
-async def count_completed_stages(
-        team_id: UUID
-):
+async def count_completed_stages(team_id: UUID):
     async with database_session() as session:
         result = await session.scalar(
             select(func.count()).select_from(StageModel).where(

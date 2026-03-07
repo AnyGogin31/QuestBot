@@ -14,14 +14,20 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from uuid import UUID
+
+from sqlalchemy import select
+
 from ... import database_session
-from ...models import TeamModel
-from ...models.common import TeamStatus
+from ...models import StageModel
+from ...models.common import StageStatus
 
 
-async def mark_team_ready(
-        team: TeamModel
-):
+async def get_active_stage_for_team(team_id: UUID):
     async with database_session() as session:
-        team.status = TeamStatus.EN_ROUTE
-        await session.flush()
+        return await session.scalar(
+            select(StageModel).where(
+                StageModel.team_id == team_id,
+                StageModel.status.in_([StageStatus.ASSIGNED, StageStatus.IN_PROGRESS])
+            )
+        )

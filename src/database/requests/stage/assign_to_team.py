@@ -14,14 +14,28 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from uuid import UUID
+
 from sqlalchemy import select
 
 from ... import database_session
-from ...models import GameModel
+from ...models import ActorModel, StageModel
+from ...models.common import ActorStatus
 
 
-async def get_game_by_code(
-        code: str
+async def assign_actor_to_team(
+        game_id: UUID,
+        team_id: UUID,
+        actor_id: UUID
 ):
     async with database_session() as session:
-        return await session.scalar(select(GameModel).where(GameModel.code == code.upper()))
+        actor = await session.scalar(select(ActorModel).where(ActorModel.id == actor_id))
+        stage = StageModel(
+            game_id=game_id,
+            team_id=team_id,
+            actor_id=actor_id
+        )
+        actor.status = ActorStatus.BUSY
+        session.add(stage)
+        await session.flush()
+        return stage

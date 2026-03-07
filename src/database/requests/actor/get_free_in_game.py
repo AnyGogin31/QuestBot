@@ -19,14 +19,16 @@ from uuid import UUID
 from sqlalchemy import select
 
 from ... import database_session
-from ...models import TeamModel
+from ...models import ActorModel
+from ...models.common import ActorStatus
 
 
-async def get_teams_in_game(
-        game_id: UUID
-):
+async def get_free_actors_in_game(game_id: UUID):
     async with database_session() as session:
         result = await session.execute(
-            select(TeamModel).where(TeamModel.game_id == game_id)
+            select(ActorModel).where(
+                ActorModel.game_id == game_id,
+                ActorModel.status == ActorStatus.FREE
+            )
         )
         return list(result.scalars().all())

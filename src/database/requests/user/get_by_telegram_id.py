@@ -14,18 +14,12 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from uuid import UUID
-
 from sqlalchemy import select
 
 from ... import database_session
-from ...models import TeamModel
+from ...models import UserModel
 
 
-async def get_team_by_commander(
-        commander_id: UUID
-):
+async def get_user_by_telegram_id(telegram_id: int):
     async with database_session() as session:
-        return await session.scalar(
-            select(TeamModel).where(TeamModel.commander_id == commander_id)
-        )
+        return await session.scalar(select(UserModel).where(UserModel.telegram_id == telegram_id))

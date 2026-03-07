@@ -14,20 +14,18 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import (
-    datetime,
-    UTC
-)
+from uuid import UUID
+
+from sqlalchemy import select
 
 from ... import database_session
-from ...models import GameModel
-from ...models.common import GameStatus
+from ...models import TeamModel
+from ...models.common import TeamStatus
 
 
-async def finish_game(
-        game: GameModel
-):
+async def mark_team_ready(team_id: UUID):
     async with database_session() as session:
-        game.status = GameStatus.FINISHED
-        game.finished_at = datetime.now(UTC)
-        await session.flush()
+        team = await session.scalar(select(TeamModel).where(TeamModel.id == team_id))
+        if team:
+            team.status = TeamStatus.EN_ROUTE
+            await session.flush()

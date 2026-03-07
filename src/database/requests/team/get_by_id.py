@@ -19,24 +19,9 @@ from uuid import UUID
 from sqlalchemy import select
 
 from ... import database_session
-from ...models import ActorModel, StageModel
-from ...models.common import ActorStatus
+from ...models import TeamModel
 
 
-async def find_free_unvisited_actor(
-        game_id: UUID,
-        team_id: UUID
-):
-    visited_sq = select(StageModel.actor_id).where(StageModel.team_id == team_id)
-
+async def get_team_by_id(team_id: UUID):
     async with database_session() as session:
-        result = await session.execute(
-            select(ActorModel)
-            .where(
-                ActorModel.game_id == game_id,
-                ActorModel.status == ActorStatus.FREE,
-                ActorModel.id.not_in(visited_sq)
-            )
-            .limit(1)
-        )
-        return result.scalar_one_or_none()
+        return await session.scalar(select(TeamModel).where(TeamModel.id == team_id))

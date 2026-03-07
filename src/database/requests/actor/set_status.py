@@ -14,6 +14,21 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .get_by_id import get_user_by_id
-from .get_by_telegram_id import get_user_by_telegram_id
-from .get_or_create import get_or_create_user
+from uuid import UUID
+
+from sqlalchemy import select
+
+from ... import database_session
+from ...models import ActorModel
+from ...models.common import ActorStatus
+
+
+async def set_actor_status(
+        actor_id: UUID,
+        status: ActorStatus
+):
+    async with database_session() as session:
+        actor = await session.scalar(select(ActorModel).where(ActorModel.id == actor_id))
+        if actor:
+            actor.status = status
+            await session.flush()

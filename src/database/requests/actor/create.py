@@ -17,23 +17,26 @@
 from uuid import UUID
 
 from ... import database_session
-from ...models import ActorModel, StageModel
+from ...models import ActorModel
 from ...models.common import ActorStatus
 
 
-async def assign_actor_to_team(
+async def create_actor(
         game_id: UUID,
-        team_id: UUID,
-        actor: ActorModel
+        user_id: UUID,
+        name: str,
+        location: str | None = None,
+        description: str | None = None
 ):
-    stage = StageModel(
-        game_id=game_id,
-        team_id=team_id,
-        actor_id=actor.id
-    )
-
     async with database_session() as session:
-        actor.status = ActorStatus.BUSY
-        session.add(stage)
+        actor = ActorModel(
+            game_id=game_id,
+            user_id=user_id,
+            name=name,
+            location=location,
+            description=description,
+            status=ActorStatus.FREE
+        )
+        session.add(actor)
         await session.flush()
-        return stage
+        return actor

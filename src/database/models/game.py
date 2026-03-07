@@ -61,6 +61,11 @@ class GameModel(BaseModel):
         unique=True
     )
 
+    actor_code: Mapped[str] = mapped_column(
+        String(10),
+        unique=True
+    )
+
     author_id: Mapped[UUID] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey("users.id")

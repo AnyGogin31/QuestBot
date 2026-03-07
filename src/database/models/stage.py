@@ -27,6 +27,7 @@ from sqlalchemy import (
     DateTime,
     Enum,
     ForeignKey,
+    Integer,
     Text,
     Uuid
 )
@@ -67,6 +68,10 @@ class StageModel(BaseModel):
     status: Mapped[StageStatus] = mapped_column(
         Enum(StageStatus),
         default=StageStatus.ASSIGNED
+    )
+
+    score: Mapped[Optional[int]] = mapped_column(
+        Integer
     )
 
     comment: Mapped[Optional[str]] = mapped_column(

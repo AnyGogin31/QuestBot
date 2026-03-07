@@ -31,6 +31,7 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     func,
+    Integer,
     String,
     Text,
     Uuid
@@ -74,6 +75,14 @@ class ActorModel(BaseModel):
 
     description: Mapped[Optional[str]] = mapped_column(
         Text
+    )
+
+    min_score: Mapped[Optional[int]] = mapped_column(
+        Integer
+    )
+
+    max_score: Mapped[Optional[int]] = mapped_column(
+        Integer
     )
 
     status: Mapped[ActorStatus] = mapped_column(

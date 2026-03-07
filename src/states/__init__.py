@@ -15,5 +15,5 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from .actor import JoinActorStates, ActorStates
-from .author import CreateGameStates, AuthorStates
+from .author import CreateGameStates
 from .commander import JoinCommanderStates, CommanderStates

@@ -16,7 +16,7 @@
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from uuid import UUID
 
@@ -24,22 +24,30 @@ from ...database.models.common import StageStatus
 from ...database.requests.actor import get_actor_by_id
 from ...database.requests.stage import get_active_stage_for_team
 from ...database.requests.team import count_completed_stages
+from ...keyboards.commander import commander_in_game
 from ...states import CommanderStates
 from ...utils.escape import esc
 
 router = Router()
 
 
-@router.message(CommanderStates.in_game, F.text == "📍 Текущий этап")
-async def current_stage(message: Message, state: FSMContext):
+_STAGE_STATUS = {
+    StageStatus.ASSIGNED: "🚶 Направляйтесь к актёру",
+    StageStatus.IN_PROGRESS: "🎭 Взаимодействие",
+}
+
+
+@router.callback_query(F.data == "commander:current_stage", CommanderStates.in_game)
+async def current_stage(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     team_id = UUID(data["team_id"])
     stage = await get_active_stage_for_team(team_id)
 
     if not stage:
         done = await count_completed_stages(team_id)
-        await message.answer(
-            f"⏳ Ожидание следующего актёра...\nПройдено этапов: {done}"
+        await callback.message.edit_text(
+            f"⏳ <b>Ожидание следующего актёра...</b>\nПройдено этапов: {done}",
+            reply_markup=commander_in_game(),
         )
         return
 
@@ -49,10 +57,5 @@ async def current_stage(message: Message, state: FSMContext):
         text += f"📍 <b>Локация:</b> {esc(actor.location)}\n"
     if actor.description:
         text += f"📝 {esc(actor.description)}\n"
-
-    status_labels = {
-        StageStatus.ASSIGNED: "🚶 Направляйтесь к актёру",
-        StageStatus.IN_PROGRESS: "🎭 Взаимодействие",
-    }
-    text += f"\n🔄 <b>Статус:</b> {status_labels.get(stage.status, str(stage.status))}"
-    await message.answer(text)
+    text += f"\n🔄 <b>Статус:</b> {_STAGE_STATUS.get(stage.status, str(stage.status))}"
+    await callback.message.edit_text(text, reply_markup=commander_in_game())

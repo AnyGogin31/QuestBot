@@ -16,7 +16,7 @@
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from uuid import UUID
 
@@ -29,20 +29,20 @@ from ...states import ActorStates
 router = Router()
 
 
-@router.message(ActorStates.in_game, F.text == "🏁 Команда прибыла")
-async def team_arrived(message: Message, state: FSMContext) -> None:
+@router.callback_query(F.data == "actor:team_arrived", ActorStates.in_game)
+async def team_arrived(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     stage = await get_active_stage_for_actor(UUID(data["actor_id"]))
 
     if stage is None:
-        await message.answer("⏳ Вам ещё не назначена команда. Ожидайте")
+        await callback.answer("⏳ Вам ещё не назначена команда", show_alert=True)
         return
     if stage.status != StageStatus.ASSIGNED:
-        await message.answer("ℹ️ Команда уже отмечена как прибывшая")
+        await callback.answer("ℹ️ Команда уже отмечена как прибывшая", show_alert=True)
         return
 
     await mark_team_arrived(stage.id)
-    await message.answer(
+    await callback.message.edit_text(
         "✅ <b>Команда отмечена как прибывшая.</b>\n\nПосле взаимодействия нажмите 'Этап завершён'",
         reply_markup=actor_in_game(),
     )

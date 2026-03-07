@@ -16,13 +16,14 @@
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery
 
 from uuid import UUID
 
 from ...database.models.common import TeamStatus
 from ...database.requests.actor import get_actor_by_id
 from ...database.requests.team import get_teams_in_game, count_completed_stages
+from ...keyboards.actor import actor_in_game
 from ...states import ActorStates
 from ...utils.escape import esc
 
@@ -43,8 +44,8 @@ _STATUS_LABELS = {
 }
 
 
-@router.message(ActorStates.in_game, F.text == "📋 Список команд")
-async def teams_list(message: Message, state: FSMContext) -> None:
+@router.callback_query(F.data == "actor:teams_list", ActorStates.in_game)
+async def teams_list(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     actor = await get_actor_by_id(UUID(data["actor_id"]))
     teams = await get_teams_in_game(actor.game_id)
@@ -55,7 +56,11 @@ async def teams_list(message: Message, state: FSMContext) -> None:
         em = _STATUS_EMOJI.get(team.status, "❓")
         label = _STATUS_LABELS.get(team.status, str(team.status))
         lines.append(
-            f"{em} <b>{esc(team.name)}</b> - {team.member_count} чел. | этапов: {done} | {label}"
+            f"{em} <b>{esc(team.name)}</b> - {team.member_count} чел."
+            f" | этапов: {done} | {label}"
         )
 
-    await message.answer("📋 <b>Список команд:</b>\n\n" + "\n".join(lines))
+    await callback.message.edit_text(
+        "📋 <b>Список команд:</b>\n\n" + "\n".join(lines),
+        reply_markup=actor_in_game(),
+    )

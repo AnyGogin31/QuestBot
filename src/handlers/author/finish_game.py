@@ -16,49 +16,42 @@
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery
 
 from ...database.models.common import GameStatus
 from ...database.requests.game import get_game_by_code, finish_game
 from ...database.requests.stage import get_game_results
 from ...keyboards.author import confirm_finish_game, author_main
-from ...states import AuthorStates
 from ...utils.escape import esc
 
 router = Router()
 
 
-@router.message(AuthorStates.dashboard, F.text == "🏁 Завершить игру")
-async def finish_game_prompt(message: Message) -> None:
-    await message.answer(
+@router.callback_query(F.data.startswith("author:finish_game:"))
+async def finish_game_prompt(callback: CallbackQuery) -> None:
+    code = callback.data.split(":", 2)[2]
+    await callback.message.edit_text(
         "⚠️ <b>Завершить игру?</b>\n\nВсе активные этапы будут остановлены. Действие необратимо",
-        reply_markup=confirm_finish_game(),
+        reply_markup=confirm_finish_game(code),
     )
 
 
-@router.callback_query(F.data == "confirm_finish_game")
+@router.callback_query(F.data.startswith("author:confirm_finish:"))
 async def confirm_finish(callback: CallbackQuery, state: FSMContext) -> None:
-    data = await state.get_data()
-    game = await get_game_by_code(data["game_code"])
+    code = callback.data.split(":", 2)[2]
+    game = await get_game_by_code(code)
     if game.status != GameStatus.RUNNING:
-        await callback.answer("Игра не запущена")
+        await callback.answer("Игра не запущена", show_alert=True)
         return
 
-    await finish_game(data["game_code"])
+    await finish_game(code)
     results = await get_game_results(game.id)
 
-    await callback.message.delete()
     medals = ["🥇", "🥈", "🥉"]
     text = "🏁 <b>Игра завершена!</b>\n\n📊 <b>Итоги:</b>\n\n"
     for i, r in enumerate(results, 1):
-        medal = medals[i - 1] if i <= 3 else f"{i}."
+        medal = medals[i - 1] if i <= 3 else f"{i}"
         text += f"{medal} <b>{esc(r['team'].name)}</b> - {r['total']} баллов\n"
 
-    await callback.message.answer(text, reply_markup=author_main())
-    await state.set_state(AuthorStates.main)
-
-
-@router.callback_query(F.data == "cancel_finish_game")
-async def cancel_finish(callback: CallbackQuery) -> None:
-    await callback.message.delete()
-    await callback.answer("Отменено")
+    await callback.message.edit_text(text, reply_markup=author_main())
+    await state.clear()

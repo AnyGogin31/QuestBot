@@ -71,7 +71,6 @@ async def enter_score(message: Message, state: FSMContext, bot: Bot) -> None:
 
     await state.set_state(ActorStates.in_game)
     await message.answer(
-        f"✅ <b>Баллы выставлены: {score}</b>\n\n"
-        f"Нажмите '➡️ Готов к следующей команде', когда займёте позицию",
+        f"✅ <b>Баллы выставлены: {score}</b>",
         reply_markup=actor_in_game(),
     )

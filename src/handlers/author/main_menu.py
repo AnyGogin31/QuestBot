@@ -16,56 +16,78 @@
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery
 
 from uuid import UUID
 
 from ...database.requests.game import get_games_by_author, get_game_by_code
+from ...database.requests.user import get_user_by_telegram_id
 from ...keyboards.author import games_list, author_main, author_dashboard
-from ...states import AuthorStates, CreateGameStates
+from ...states import CreateGameStates
 from ...utils.escape import esc
 
 router = Router()
 
 
-@router.message(AuthorStates.main, F.text == "🎮 Создать новую игру")
-async def to_create_game(message: Message, state: FSMContext):
+@router.callback_query(F.data == "author:create_game")
+async def to_create_game(callback: CallbackQuery, state: FSMContext) -> None:
     await state.set_state(CreateGameStates.waiting_title)
-    await message.answer(
+    await callback.message.edit_text(
         "🎮 <b>Создание игры</b>\n\nВведите название игры (или /skip):"
     )
 
 
-@router.message(AuthorStates.main, F.text == "📋 Мои игры")
-async def my_games(message: Message, state: FSMContext):
+@router.callback_query(F.data == "author:my_games")
+async def my_games(callback: CallbackQuery, state: FSMContext) -> None:
+    await state.clear()
     data = await state.get_data()
-    games = await get_games_by_author(UUID(data["user_id"]))
+    user_id_raw = data.get("user_id")
+    if not user_id_raw:
+        user = await get_user_by_telegram_id(callback.from_user.id)
+        if not user:
+            await callback.answer("Ошибка: пользователь не найден")
+            return
+        user_id_raw = str(user.id)
+        await state.update_data(user_id=user_id_raw)
+
+    games = await get_games_by_author(UUID(user_id_raw))
     if not games:
-        await message.answer("У вас пока нет игр")
+        await callback.message.edit_text(
+            "У вас пока нет игр",
+            reply_markup=author_main(),
+        )
         return
-    await message.answer("📋 <b>Ваши игры:</b>", reply_markup=games_list(games))
+    await callback.message.edit_text(
+        "📋 <b>Ваши игры:</b>", reply_markup=games_list(games)
+    )
 
 
-@router.message(AuthorStates.dashboard, F.text == "🔙 Главное меню")
-async def back_to_main(message: Message, state: FSMContext):
-    await state.set_state(AuthorStates.main)
-    await message.answer("Главное меню:", reply_markup=author_main())
+@router.callback_query(F.data == "author:back_main")
+async def back_main(callback: CallbackQuery, state: FSMContext) -> None:
+    await state.clear()
+    from ...database.requests.user import get_user_by_telegram_id
+
+    user = await get_user_by_telegram_id(callback.from_user.id)
+    if user:
+        await state.update_data(user_id=str(user.id))
+    await callback.message.edit_text(
+        "👋 <b>QuestBot</b>\n\nВыберите действие:",
+        reply_markup=author_main(),
+    )
 
 
-@router.callback_query(F.data.startswith("open_game:"))
-async def open_game(callback: CallbackQuery, state: FSMContext):
-    code = callback.data.split(":", 1)[1]
+@router.callback_query(F.data.startswith("author:open:"))
+async def open_game(callback: CallbackQuery, state: FSMContext) -> None:
+    code = callback.data.split(":", 2)[2]
     game = await get_game_by_code(code)
     if not game:
         await callback.answer("Игра не найдена")
         return
-    await state.set_state(AuthorStates.dashboard)
     await state.update_data(game_code=game.code)
-    await callback.message.delete()
     title = esc(game.title) or f"Игра {game.code}"
-    await callback.message.answer(
+    await callback.message.edit_text(
         f"📊 <b>Дашборд: {title}</b>\n"
         f"🔑 Командирский код: <code>{game.code}</code>\n"
         f"🎭 Актёрский код: <code>{game.actor_code}</code>",
-        reply_markup=author_dashboard(game.status),
+        reply_markup=author_dashboard(game.code, game.status),
     )

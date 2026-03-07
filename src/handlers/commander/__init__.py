@@ -14,15 +14,6 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .actor import router as actor_router
-from .author import router as author_router
-from .commander import router as commander_router
-from .start import router as start_router
+from aiogram import Router
 
-
-all_handlers = [
-    actor_router,
-    author_router,
-    commander_router,
-    start_router
-]
+router = Router()

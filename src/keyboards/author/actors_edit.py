@@ -14,15 +14,14 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .actor import router as actor_router
-from .author import router as author_router
-from .commander import router as commander_router
-from .start import router as start_router
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-all_handlers = [
-    actor_router,
-    author_router,
-    commander_router,
-    start_router
-]
+def actors_edit(actors):
+    builder = InlineKeyboardBuilder()
+    for actor in actors:
+        loc = f" [{actor.location}]" if actor.location else ""
+        builder.button(text=f"🎭 {actor.name}{loc}", callback_data=f"edit_actor:{actor.id}")
+    builder.button(text="❌ Отмена", callback_data="edit_cancel")
+    builder.adjust(1)
+    return builder.as_markup()

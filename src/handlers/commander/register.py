@@ -24,7 +24,7 @@ from ...database.requests.game import get_game_by_code
 from ...database.requests.team import get_team_by_commander, create_team
 from ...keyboards.commander import commander_lobby
 from ...states import JoinCommanderStates, CommanderStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -78,9 +78,9 @@ async def step_member_count(message: Message, state: FSMContext):
     await state.update_data(team_id=str(team.id))
     await message.answer(
         f"✅ <b>Команда зарегистрирована!</b>\n\n"
-        f"🏷 <b>Название:</b> {data['team_name']}\n"
+        f"🏷 <b>Название:</b> {esc(data['team_name'])}\n"
         f"👤 <b>Участников:</b> {count}\n"
-        f"🎮 <b>Игра:</b> {game.title or game.code}\n\n"
+        f"🎮 <b>Игра:</b> {esc(game.title) or game.code}\n\n"
         f"Нажмите <b>'Готов к игре'</b>, когда будете готовы",
         reply_markup=commander_lobby(),
     )

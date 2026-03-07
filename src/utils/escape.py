@@ -14,17 +14,10 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram.utils.keyboard import InlineKeyboardBuilder
-
-from ...utils.escape import esc
+from html import escape
 
 
-def actor_confirm_complete(team_name: str):
-    builder = InlineKeyboardBuilder()
-    builder.button(
-        text=f"✅ Да, завершить этап с '{esc(team_name)}'",
-        callback_data="actor_confirm_complete",
-    )
-    builder.button(text="❌ Нет, вернуться", callback_data="actor_cancel_complete")
-    builder.adjust(1)
-    return builder.as_markup()
+def esc(value):
+    if value is None:
+        return ""
+    return escape(str(value))

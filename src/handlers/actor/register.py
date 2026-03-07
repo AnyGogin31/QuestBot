@@ -24,6 +24,7 @@ from ...database.requests.actor import get_actor_by_user_and_game, create_actor
 from ...database.requests.game import get_game_by_code
 from ...keyboards.actor import actor_lobby
 from ...states import JoinActorStates, ActorStates
+from ...utils.escape import esc
 
 router = Router()
 
@@ -76,9 +77,9 @@ async def step_description(message: Message, state: FSMContext) -> None:
     await state.update_data(actor_id=str(actor.id))
     await message.answer(
         f"✅ <b>Актёр зарегистрирован!</b>\n\n"
-        f"👤 <b>Персонаж:</b> {data['character_name']}\n"
-        f"📍 <b>Локация:</b> {data.get('location') or 'не указана'}\n"
-        f"🎮 <b>Игра:</b> {game.title or game.code}\n\n"
+        f"👤 <b>Персонаж:</b> {esc(data['character_name'])}\n"
+        f"📍 <b>Локация:</b> {esc(data.get('location')) or 'не указана'}\n"
+        f"🎮 <b>Игра:</b> {esc(game.title) or game.code}\n\n"
         f"Нажмите <b>'Готов к игре'</b>, когда займёте позицию",
         reply_markup=actor_lobby(),
     )

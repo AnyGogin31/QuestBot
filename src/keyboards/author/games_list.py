@@ -16,11 +16,10 @@
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from html import escape
-
 from typing import List
 
 from ...database.models import GameModel
+from ...utils.escape import esc
 
 
 def games_list(games: List[GameModel]):
@@ -28,7 +27,7 @@ def games_list(games: List[GameModel]):
     for game in games:
         title = game.title or f"Игра {game.code}"
         builder.button(
-            text=f"{escape(title)} [{game.status}]",
+            text=f"{esc(title)} [{game.status}]",
             callback_data=f"open_game:{game.code}",
         )
     builder.adjust(1)

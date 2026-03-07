@@ -23,7 +23,7 @@ from ...database.requests.actor import get_actors_in_game
 from ...database.requests.game import get_game_by_code
 from ...database.requests.team import get_teams_in_game
 from ...states import AuthorStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -52,16 +52,16 @@ async def participants(message: Message, state: FSMContext):
     text += f"<b>Команды ({len(teams)}):</b>\n"
     for t in teams:
         label = _TEAM_STATUS_LABELS.get(t.status, str(t.status))
-        text += f"  {label} — {t.name} ({t.member_count} чел.)\n"
+        text += f"  {label} — {esc(t.name)} ({t.member_count} чел.)\n"
 
     text += f"\n<b>Актёры ({len(actors)}):</b>\n"
     for a in actors:
         label = _ACTOR_STATUS_LABELS.get(a.status, str(a.status))
-        loc = f" [{a.location}]" if a.location else ""
+        loc = f" [{esc(a.location)}]" if a.location else ""
         score_range = ""
         if a.min_score is not None or a.max_score is not None:
             mn = a.min_score if a.min_score is not None else game.min_score
             mx = a.max_score if a.max_score is not None else game.max_score
             score_range = f" ({mn}-{mx})"
-        text += f"  {label} - {a.name}{loc}{score_range}\n"
+        text += f"  {label} - {esc(a.name)}{loc}{score_range}\n"
     await message.answer(text)

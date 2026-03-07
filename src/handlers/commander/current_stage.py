@@ -25,7 +25,7 @@ from ...database.requests.actor import get_actor_by_id
 from ...database.requests.stage import get_active_stage_for_team
 from ...database.requests.team import count_completed_stages
 from ...states import CommanderStates
-
+from ...utils.escape import esc
 
 router = Router()
 
@@ -44,11 +44,11 @@ async def current_stage(message: Message, state: FSMContext):
         return
 
     actor = await get_actor_by_id(stage.actor_id)
-    text = f"📍 <b>Текущий этап</b>\n\n👤 <b>Актёр:</b> {actor.name}\n"
+    text = f"📍 <b>Текущий этап</b>\n\n👤 <b>Актёр:</b> {esc(actor.name)}\n"
     if actor.location:
-        text += f"📍 <b>Локация:</b> {actor.location}\n"
+        text += f"📍 <b>Локация:</b> {esc(actor.location)}\n"
     if actor.description:
-        text += f"📝 {actor.description}\n"
+        text += f"📝 {esc(actor.description)}\n"
 
     status_labels = {
         StageStatus.ASSIGNED: "🚶 Направляйтесь к актёру",

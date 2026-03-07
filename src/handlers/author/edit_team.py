@@ -13,11 +13,12 @@
 #
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from uuid import UUID
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
+
+from uuid import UUID
 
 from ...database.requests.game import get_game_by_code
 from ...database.requests.team import get_teams_in_game, update_team
@@ -26,6 +27,7 @@ from ...keyboards.author.team_fields import team_fields
 from ...keyboards.author.teams_edit import teams_edit
 from ...states import AuthorStates
 from ...states.author import EditTeamStates
+from ...utils.escape import esc
 
 router = Router()
 
@@ -76,7 +78,7 @@ async def edit_team_save_name(message: Message, state: FSMContext) -> None:
     await state.set_state(AuthorStates.dashboard)
     game = await get_game_by_code(data["game_code"])
     await message.answer(
-        f"✅ Название команды изменено на '{name}'",
+        f"✅ Название команды изменено на '{esc(name)}'",
         reply_markup=author_dashboard(game.status),
     )
 

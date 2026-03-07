@@ -20,6 +20,7 @@ from ...database.models import TeamModel, ActorModel
 from ...database.requests.user import get_user_by_id
 from ...keyboards.commander import commander_in_game
 from ...states import CommanderStates
+from ...utils.escape import esc
 from ...utils.fsm import set_user_state
 from ...utils.logging import get_logger
 
@@ -31,11 +32,11 @@ async def notify_team_new_actor(bot: Bot, team: TeamModel, actor: ActorModel) ->
     user = await get_user_by_id(team.commander_id)
     if not user:
         return
-    text = f"🎭 <b>Следующий этап!</b>\n\nНаправляйтесь к актёру:\n👤 <b>{actor.name}</b>\n"
+    text = f"🎭 <b>Следующий этап!</b>\n\nНаправляйтесь к актёру:\n👤 <b>{esc(actor.name)}</b>\n"
     if actor.location:
-        text += f"📍 <b>Локация:</b> {actor.location}\n"
+        text += f"📍 <b>Локация:</b> {esc(actor.location)}\n"
     if actor.description:
-        text += f"📝 {actor.description}\n"
+        text += f"📝 {esc(actor.description)}\n"
     try:
         await set_user_state(user.telegram_id, CommanderStates.in_game.state)
         await bot.send_message(user.telegram_id, text, reply_markup=commander_in_game())

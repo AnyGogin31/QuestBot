@@ -82,7 +82,7 @@ async def step_max_score(message: Message, state: FSMContext) -> None:
     await message.answer(
         f"✅ <b>Игра создана!</b>\n\n"
         f"📛 <b>Название:</b> {esc(game.title) or 'Без названия'}\n"
-        f"⚖️ <b>Баллы:</b> {min_score} – {max_score}\n\n"
+        f"⚖️ <b>Баллы:</b> {min_score} - {max_score}\n\n"
         f"🔑 <b>Ссылка для командиров:</b>\n<code>/start {game.code}</code>\n\n"
         f"🎭 <b>Ссылка для актёров:</b>\n<code>/start {game.actor_code}</code>",
         reply_markup=author_dashboard(game.status),

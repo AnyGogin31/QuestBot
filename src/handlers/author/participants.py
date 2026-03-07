@@ -52,7 +52,7 @@ async def participants(message: Message, state: FSMContext):
     text += f"<b>Команды ({len(teams)}):</b>\n"
     for t in teams:
         label = _TEAM_STATUS_LABELS.get(t.status, str(t.status))
-        text += f"  {label} — {esc(t.name)} ({t.member_count} чел.)\n"
+        text += f"  {label} - {esc(t.name)} ({t.member_count} чел.)\n"
 
     text += f"\n<b>Актёры ({len(actors)}):</b>\n"
     for a in actors:

@@ -52,7 +52,7 @@ async def confirm_finish(callback: CallbackQuery, state: FSMContext) -> None:
     text = "🏁 <b>Игра завершена!</b>\n\n📊 <b>Итоги:</b>\n\n"
     for i, r in enumerate(results, 1):
         medal = medals[i - 1] if i <= 3 else f"{i}."
-        text += f"{medal} <b>{esc(r['team'].name)}</b> — {r['total']} баллов\n"
+        text += f"{medal} <b>{esc(r['team'].name)}</b> - {r['total']} баллов\n"
 
     await callback.message.answer(text, reply_markup=author_main())
     await state.set_state(AuthorStates.main)

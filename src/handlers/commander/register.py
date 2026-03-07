@@ -16,24 +16,5 @@
 
 from aiogram import Router
 
-from .main_menu import router as main_menu_router
-from .create_game import router as create_game_router
-from .participants import router as participants_router
-from .start_game import router as start_game_router
-from .game_status import router as game_status_router
-from .finish_game import router as finish_game_router
-from .edit_team import router as edit_team_router
-from .edit_actor import router as edit_actor_router
-
 
 router = Router()
-router.include_routers(
-    main_menu_router,
-    create_game_router,
-    participants_router,
-    start_game_router,
-    game_status_router,
-    finish_game_router,
-    edit_team_router,
-    edit_actor_router
-)

@@ -16,4 +16,22 @@
 
 from aiogram import Router
 
+from .register import router as register_router
+from .ready import router as ready_router
+from .team_arrived import router as team_arrived_router
+from .stage_complete import router as stage_complete_router
+from .score_entry import router as score_entry_router
+from .ready_next import router as ready_next_router
+from .teams_list import router as teams_list_router
+
+
 router = Router()
+router.include_routers(
+    register_router,
+    ready_router,
+    team_arrived_router,
+    stage_complete_router,
+    score_entry_router,
+    ready_next_router,
+    teams_list_router
+)

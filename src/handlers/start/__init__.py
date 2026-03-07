@@ -16,4 +16,8 @@
 
 from aiogram import Router
 
+from .cmd_start import router as cmd_start_router
+
+
 router = Router()
+router.include_routers(cmd_start_router)

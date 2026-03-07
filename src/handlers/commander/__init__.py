@@ -16,4 +16,16 @@
 
 from aiogram import Router
 
+from .register import router as register_router
+from .ready import router as ready_router
+from .current_stage import router as current_stage_router
+from .my_results import router as my_results_router
+
+
 router = Router()
+router.include_routers(
+    register_router,
+    ready_router,
+    current_stage_router,
+    my_results_router
+)

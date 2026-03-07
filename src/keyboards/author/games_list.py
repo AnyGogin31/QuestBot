@@ -19,16 +19,26 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from typing import List
 
 from ...database.models import GameModel
-from ...utils.escape import esc
+from ...database.models.common import GameStatus
+
+
+_STATUS_LABELS = {
+    GameStatus.CREATED: "📝 создана",
+    GameStatus.PREPARED: "✅ готова",
+    GameStatus.RUNNING: "▶️ идёт",
+    GameStatus.FINISHED: "🏁 завершена",
+    GameStatus.CANCELLED: "❌ отменена",
+}
 
 
 def games_list(games: List[GameModel]):
     builder = InlineKeyboardBuilder()
     for game in games:
         title = game.title or f"Игра {game.code}"
+        label = _STATUS_LABELS.get(game.status, str(game.status))
         builder.button(
-            text=f"{esc(title)} [{game.status}]",
-            callback_data=f"open_game:{game.code}",
+            text=f"{title} [{label}]", callback_data=f"author:open:{game.code}"
         )
+    builder.button(text="🔙 Назад", callback_data="author:back_main")
     builder.adjust(1)
     return builder.as_markup()

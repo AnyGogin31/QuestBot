@@ -47,7 +47,7 @@ async def stage_complete_prompt(message: Message, state: FSMContext) -> None:
     await state.update_data(stage_id=str(stage.id))
     await message.answer(
         f"⚠️ <b>Завершить этап с командой '{esc(team.name)}'?</b>\n\nЭто действие нельзя отменить",
-        reply_markup=actor_confirm_complete(team.name),
+        reply_markup=actor_confirm_complete(),
     )
 
 

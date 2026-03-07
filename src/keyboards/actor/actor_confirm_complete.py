@@ -16,15 +16,10 @@
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from ...utils.escape import esc
 
-
-def actor_confirm_complete(team_name: str):
+def actor_confirm_complete():
     builder = InlineKeyboardBuilder()
-    builder.button(
-        text=f"✅ Да, завершить этап с '{esc(team_name)}'",
-        callback_data="actor_confirm_complete",
-    )
-    builder.button(text="❌ Нет, вернуться", callback_data="actor_cancel_complete")
+    builder.button(text=f"✅ Да, завершить", callback_data="actor:confirm_complete")
+    builder.button(text="❌ Нет, вернуться", callback_data="actor:cancel_complete")
     builder.adjust(1)
     return builder.as_markup()

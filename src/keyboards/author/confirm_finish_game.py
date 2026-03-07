@@ -17,9 +17,11 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def confirm_finish_game():
+def confirm_finish_game(game_code: str):
     builder = InlineKeyboardBuilder()
-    builder.button(text="✅ Да, завершить игру", callback_data="confirm_finish_game")
-    builder.button(text="❌ Отмена", callback_data="cancel_finish_game")
+    builder.button(
+        text="✅ Да, завершить игру", callback_data=f"author:confirm_finish:{game_code}"
+    )
+    builder.button(text="❌ Отмена", callback_data=f"author:open:{game_code}")
     builder.adjust(1)
     return builder.as_markup()

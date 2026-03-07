@@ -14,12 +14,12 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def author_main():
-    builder = ReplyKeyboardBuilder()
-    builder.button(text="🎮 Создать новую игру")
-    builder.button(text="📋 Мои игры")
+    builder = InlineKeyboardBuilder()
+    builder.button(text="🎮 Создать новую игру", callback_data="author:create_game")
+    builder.button(text="📋 Мои игры", callback_data="author:my_games")
     builder.adjust(1)
-    return builder.as_markup(resize_keyboard=True)
+    return builder.as_markup()

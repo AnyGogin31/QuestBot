@@ -14,11 +14,11 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def actor_lobby():
-    builder = ReplyKeyboardBuilder()
-    builder.button(text="✅ Готов к игре")
+    builder = InlineKeyboardBuilder()
+    builder.button(text="✅ Готов к игре", callback_data="actor:ready")
     builder.adjust(1)
-    return builder.as_markup(resize_keyboard=True)
+    return builder.as_markup()

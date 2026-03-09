@@ -21,12 +21,12 @@ from typing import List, Optional
 from uuid import UUID, uuid7
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     Enum,
     ForeignKey,
     func,
     Integer,
-    JSON,
     String,
     Text,
     Uuid,
@@ -50,8 +50,6 @@ class GameModel(BaseModel):
 
     author_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"))
 
-    admin_ids: Mapped[List[UUID]] = mapped_column(JSON, default=list)
-
     status: Mapped[GameStatus] = mapped_column(
         Enum(GameStatus), default=GameStatus.CREATED
     )
@@ -59,6 +57,10 @@ class GameModel(BaseModel):
     min_score: Mapped[int] = mapped_column(Integer, default=0)
 
     max_score: Mapped[int] = mapped_column(Integer, default=10)
+
+    commanders_closed: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    actors_closed: Mapped[bool] = mapped_column(Boolean, default=False)
 
     title: Mapped[Optional[str]] = mapped_column(String(255))
 

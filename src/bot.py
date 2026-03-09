@@ -63,9 +63,9 @@ async def start_bot():
 
     init_storage_holder(dispatcher.storage, me.id)
 
-    dispatcher.message.middleware(ErrorLoggerMiddleware())
-    dispatcher.callback_query.middleware(ErrorLoggerMiddleware())
-    dispatcher.message.middleware(ThrottlingMiddleware())
+    for observer in (dispatcher.message, dispatcher.callback_query):
+        observer.middleware(ErrorLoggerMiddleware())
+        observer.middleware(ThrottlingMiddleware())
 
     include_handlers(dispatcher, all_handlers)
 

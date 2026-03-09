@@ -17,12 +17,13 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def teams_edit(game_code: str, teams):
+def teams_edit(game_code: str, teams, action: str = "edit"):
     builder = InlineKeyboardBuilder()
+    cb_prefix = "edit_team_select" if action == "edit" else "del_team_select"
     for team in teams:
         builder.button(
             text=f"👥 {team.name} ({team.member_count} чел.)",
-            callback_data=f"edit_team_select:{team.id}",
+            callback_data=f"{cb_prefix}:{team.id}",
         )
     builder.button(text="❌ Отмена", callback_data=f"author:open:{game_code}")
     builder.adjust(1)

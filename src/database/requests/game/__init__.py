@@ -14,9 +14,11 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+from .cancel import cancel_game
 from .create import create_game
 from .finish import finish_game
 from .get_by_actor_code import get_game_by_actor_code
 from .get_by_author import get_games_by_author
 from .get_by_code import get_game_by_code
+from .set_registration import set_actors_closed, set_commanders_closed
 from .start import start_game

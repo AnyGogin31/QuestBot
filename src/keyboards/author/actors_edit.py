@@ -17,13 +17,14 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def actors_edit(game_code: str, actors):
+def actors_edit(game_code: str, actors, action: str = "edit"):
     builder = InlineKeyboardBuilder()
+    cb_prefix = "edit_actor_select" if action == "edit" else "del_actor_select"
     for actor in actors:
         loc = f" [{actor.location}]" if actor.location else ""
         builder.button(
             text=f"🎭 {actor.name}{loc}",
-            callback_data=f"edit_actor_select:{actor.id}",
+            callback_data=f"{cb_prefix}:{actor.id}",
         )
     builder.button(text="❌ Отмена", callback_data=f"author:open:{game_code}")
     builder.adjust(1)

@@ -17,7 +17,7 @@
 from aiogram import Router
 from aiogram.filters import CommandStart, CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message
 
 from ...database.models.common import GameStatus
 from ...database.requests.game import get_game_by_code, get_game_by_actor_code
@@ -32,16 +32,10 @@ router = Router()
 _JOINABLE = (GameStatus.CREATED, GameStatus.PREPARED, GameStatus.RUNNING)
 
 
-async def _remove_reply_keyboard(message: Message) -> None:
-    tmp = await message.answer("\u200b", reply_markup=ReplyKeyboardRemove())
-    await tmp.delete()
-
-
 @router.message(CommandStart())
 async def cmd_start(
     message: Message, state: FSMContext, command: CommandObject
 ) -> None:
-    await _remove_reply_keyboard(message)
     args = command.args
     user = await get_or_create_user(
         telegram_id=message.from_user.id,

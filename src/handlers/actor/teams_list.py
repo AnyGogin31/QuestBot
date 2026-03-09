@@ -20,10 +20,12 @@ from aiogram.types import CallbackQuery
 
 from uuid import UUID
 
-from ...database.models.common import TeamStatus
+from ...database.models.common import TeamStatus, ActorStatus
 from ...database.requests.actor import get_actor_by_id
 from ...database.requests.team import get_teams_in_game, count_completed_stages
-from ...keyboards.actor import actor_in_game
+from ...keyboards.actor.actor_active import actor_active
+from ...keyboards.actor.actor_after_score import actor_after_score
+from ...keyboards.actor.actor_waiting import actor_waiting
 from ...states import ActorStates
 from ...utils.escape import esc
 from ...utils.safe_edit import safe_edit
@@ -45,15 +47,19 @@ _STATUS_LABELS = {
 }
 
 
+def _back(actor_status: ActorStatus):
+    if actor_status == ActorStatus.BUSY:
+        return actor_active()
+    if actor_status == ActorStatus.WAITING_SCORE:
+        return actor_after_score()
+    return actor_waiting()
+
+
 @router.callback_query(F.data == "actor:teams_list", ActorStates.in_game)
 async def teams_list(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     actor = await get_actor_by_id(UUID(data["actor_id"]))
     teams = await get_teams_in_game(actor.game_id)
-
-    if not teams:
-        await callback.answer("Команд пока нет", show_alert=True)
-        return
 
     lines = []
     for team in teams:
@@ -67,6 +73,6 @@ async def teams_list(callback: CallbackQuery, state: FSMContext) -> None:
 
     await safe_edit(
         callback,
-        "📋 <b>Список команд:</b>\n\n" + "\n".join(lines),
-        actor_in_game(),
+        "📋 <b>Список команд:</b>\n\n" + ("\n".join(lines) or "Команд пока нет"),
+        _back(actor.status),
     )

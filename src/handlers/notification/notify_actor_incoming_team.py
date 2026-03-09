@@ -18,7 +18,7 @@ from aiogram import Bot
 
 from ...database.models import ActorModel, TeamModel
 from ...database.requests.user import get_user_by_id
-from ...keyboards.actor import actor_in_game
+from ...keyboards.actor.actor_active import actor_active
 from ...utils.escape import esc
 from ...utils.logging import get_logger
 
@@ -38,6 +38,6 @@ async def notify_actor_incoming_team(
         f"👤 <b>Участников:</b> {team.member_count}\n"
     )
     try:
-        await bot.send_message(user.telegram_id, text, reply_markup=actor_in_game())
+        await bot.send_message(user.telegram_id, text, reply_markup=actor_active())
     except Exception as e:
         _logger.warning("Не удалось уведомить актёра %s: %s", user.telegram_id, e)

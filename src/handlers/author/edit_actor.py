@@ -13,11 +13,12 @@
 #
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-from uuid import UUID
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
+
+from uuid import UUID
 
 from ...database.requests.actor import get_actors_in_game, update_actor, get_actor_by_id
 from ...database.requests.game import get_game_by_code
@@ -88,7 +89,12 @@ async def _done(message: Message, state: FSMContext, text: str) -> None:
     data = await state.get_data()
     game = await get_game_by_code(data["game_code"])
     await state.set_state(None)
-    await message.answer(text, reply_markup=author_dashboard(game.code, game.status))
+    await message.answer(
+        text,
+        reply_markup=author_dashboard(
+            game.code, game.status, game.commanders_closed, game.actors_closed
+        ),
+    )
 
 
 @router.message(EditActorStates.waiting_name)

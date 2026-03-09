@@ -16,6 +16,7 @@
 
 from .count_completed_stages import count_completed_stages
 from .create import create_team
+from .delete import delete_team
 from .get_all_in_game import get_teams_in_game
 from .get_by_commander import get_team_by_commander
 from .get_by_id import get_team_by_id

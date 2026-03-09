@@ -25,7 +25,7 @@ from ...database.models.common import ActorStatus, GameStatus
 from ...database.requests.actor import get_actor_by_id, set_actor_status
 from ...database.requests.game import get_game_by_code
 from ...database.requests.stage import find_and_assign_waiting_team
-from ...keyboards.actor import actor_in_game
+from ...keyboards.actor.actor_waiting import actor_waiting
 from ...states import ActorStates
 from ...utils.escape import esc
 from ...utils.safe_edit import safe_edit
@@ -56,16 +56,12 @@ async def ready_next(callback: CallbackQuery, state: FSMContext, bot: Bot) -> No
         actor_refreshed = await get_actor_by_id(actor.id)
         await notify_team_new_actor(bot, waiting_team, actor_refreshed)
         await notify_actor_incoming_team(bot, actor_refreshed, waiting_team)
-        await safe_edit(
-            callback,
-            f"👥 <b>Вам назначена новая команда: '{esc(waiting_team.name)}'!</b>",
-            actor_in_game(),
-        )
+        await callback.answer(f"👥 Назначена команда '{esc(waiting_team.name)}'!")
     else:
         await set_actor_status(actor.id, ActorStatus.FREE)
         await safe_edit(
             callback,
             "⏳ <b>Ожидание следующей команды...</b>\n"
             "Как только команда освободится вам придёт уведомление",
-            actor_in_game(),
+            actor_waiting(),
         )

@@ -30,6 +30,19 @@ from ...utils.safe_edit import safe_edit
 router = Router()
 
 
+def _dashboard_text(game) -> str:
+    title = esc(game.title) or f"Игра {game.code}"
+    reg_cmd = "🔒 закрыт" if game.commanders_closed else "🔓 открыт"
+    reg_act = "🔒 закрыт" if game.actors_closed else "🔓 открыт"
+    return (
+        f"📊 <b>Дашборд: {title}</b>\n"
+        f"🔑 Код командиров: <code>{game.code}</code>\n"
+        f"🎭 Код актёров: <code>{game.actor_code}</code>\n"
+        f"👥 Набор команд: {reg_cmd}\n"
+        f"🎭 Набор актёров: {reg_act}"
+    )
+
+
 @router.callback_query(F.data == "author:create_game")
 async def to_create_game(callback: CallbackQuery, state: FSMContext) -> None:
     await state.set_state(CreateGameStates.waiting_title)
@@ -75,11 +88,10 @@ async def open_game(callback: CallbackQuery, state: FSMContext) -> None:
         await callback.answer("Игра не найдена", show_alert=True)
         return
     await state.update_data(game_code=game.code)
-    title = esc(game.title) or f"Игра {game.code}"
     await safe_edit(
         callback,
-        f"📊 <b>Дашборд: {title}</b>\n"
-        f"🔑 Командирский код: <code>{game.code}</code>\n"
-        f"🎭 Актёрский код: <code>{game.actor_code}</code>",
-        author_dashboard(game.code, game.status),
+        _dashboard_text(game),
+        author_dashboard(
+            game.code, game.status, game.commanders_closed, game.actors_closed
+        ),
     )

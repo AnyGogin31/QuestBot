@@ -22,7 +22,7 @@ from uuid import UUID
 
 from ...database.models.common import ActorStatus
 from ...database.requests.actor import set_actor_status
-from ...keyboards.actor import actor_in_game
+from ...keyboards.actor.actor_waiting import actor_waiting
 from ...states import ActorStates
 from ...utils.safe_edit import safe_edit
 
@@ -37,5 +37,5 @@ async def ready(callback: CallbackQuery, state: FSMContext) -> None:
     await safe_edit(
         callback,
         "✅ <b>Готов к игре!</b>\n\nОжидайте назначения команды от организатора",
-        actor_in_game(),
+        actor_waiting(),
     )

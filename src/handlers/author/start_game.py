@@ -64,7 +64,7 @@ async def do_start_game(callback: CallbackQuery, bot: Bot) -> None:
         f"✅ Команд в игре: {len(ready_teams)}\n"
         f"🎭 Актёров в игре: {len(ready_actors)}\n"
         f"📌 Назначено этапов: {len(assignments)}",
-        author_dashboard(code, game.status),
+        author_dashboard(code, game.status, game.commanders_closed, game.actors_closed),
     )
 
     for team, actor in assignments:

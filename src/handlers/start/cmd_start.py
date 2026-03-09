@@ -17,7 +17,7 @@
 from aiogram import Router
 from aiogram.filters import CommandStart, CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message
 
 from ...database.models.common import GameStatus
 from ...database.requests.game import get_game_by_code, get_game_by_actor_code
@@ -36,8 +36,6 @@ _JOINABLE = (GameStatus.CREATED, GameStatus.PREPARED, GameStatus.RUNNING)
 async def cmd_start(
     message: Message, state: FSMContext, command: CommandObject
 ) -> None:
-    await message.answer("⏳", reply_markup=ReplyKeyboardRemove())
-
     args = command.args
     user = await get_or_create_user(
         telegram_id=message.from_user.id,
@@ -45,13 +43,12 @@ async def cmd_start(
         first_name=message.from_user.first_name,
         last_name=message.from_user.last_name,
     )
-    await state.clear()
 
     if not args:
+        await state.clear()
         await state.update_data(user_id=str(user.id))
         await message.answer(
-            "👋 <b>QuestBot</b>\n\nВыберите действие:",
-            reply_markup=author_main(),
+            "👋 <b>QuestBot</b>\n\nВыберите действие:", reply_markup=author_main()
         )
         return
 
@@ -62,6 +59,10 @@ async def cmd_start(
         if game.status not in _JOINABLE:
             await message.answer("❌ Эта игра уже завершена или недоступна")
             return
+        if game.commanders_closed:
+            await message.answer("🔒 Набор командиров в эту игру закрыт")
+            return
+        await state.clear()
         await state.update_data(
             user_id=str(user.id), game_id=str(game.id), game_code=game.code
         )
@@ -79,6 +80,10 @@ async def cmd_start(
         if game.status not in _JOINABLE:
             await message.answer("❌ Эта игра уже завершена или недоступна")
             return
+        if game.actors_closed:
+            await message.answer("🔒 Набор актёров в эту игру закрыт")
+            return
+        await state.clear()
         await state.update_data(
             user_id=str(user.id), game_id=str(game.id), game_code=game.code
         )

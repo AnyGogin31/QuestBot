@@ -14,11 +14,23 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .create import create_actor
-from .delete import delete_actor
-from .get_all_in_game import get_actors_in_game
-from .get_by_id import get_actor_by_id
-from .get_by_user_and_game import get_actor_by_user_and_game
-from .get_free_in_game import get_free_actors_in_game
-from .set_status import set_actor_status
-from .update import update_actor
+from datetime import datetime, UTC
+
+from sqlalchemy import select
+
+from ... import database_session
+from ...models import GameModel
+from ...models.common import GameStatus
+
+
+async def cancel_game(game_code: str):
+    async with database_session() as session:
+        game = await session.scalar(
+            select(GameModel).where(GameModel.code == game_code)
+        )
+        if game is None:
+            return None
+        game.status = GameStatus.CANCELLED
+        game.finished_at = datetime.now(UTC)
+        await session.flush()
+        return game

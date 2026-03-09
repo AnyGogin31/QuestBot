@@ -15,5 +15,4 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 from .actor_confirm_complete import actor_confirm_complete
-from .actor_in_game import actor_in_game
 from .actor_lobby import actor_lobby

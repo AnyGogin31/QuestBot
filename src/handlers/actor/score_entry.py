@@ -33,7 +33,7 @@ from ...database.requests.stage import (
     has_unvisited_actors,
 )
 from ...database.requests.team import get_team_by_id, mark_team_finished
-from ...keyboards.actor import actor_in_game
+from ...keyboards.actor.actor_after_score import actor_after_score
 from ...states import ActorStates
 
 
@@ -72,5 +72,5 @@ async def enter_score(message: Message, state: FSMContext, bot: Bot) -> None:
     await state.set_state(ActorStates.in_game)
     await message.answer(
         f"✅ <b>Баллы выставлены: {score}</b>",
-        reply_markup=actor_in_game(),
+        reply_markup=actor_after_score(),
     )

@@ -14,11 +14,12 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .create import create_actor
-from .delete import delete_actor
-from .get_all_in_game import get_actors_in_game
-from .get_by_id import get_actor_by_id
-from .get_by_user_and_game import get_actor_by_user_and_game
-from .get_free_in_game import get_free_actors_in_game
-from .set_status import set_actor_status
-from .update import update_actor
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
+def confirm_delete_actor(actor_id: str, game_code: str):
+    builder = InlineKeyboardBuilder()
+    builder.button(text="✅ Да, удалить", callback_data=f"del_actor_confirm:{actor_id}")
+    builder.button(text="❌ Отмена", callback_data=f"author:open:{game_code}")
+    builder.adjust(1)
+    return builder.as_markup()

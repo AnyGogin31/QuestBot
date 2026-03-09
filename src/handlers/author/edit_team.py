@@ -84,7 +84,9 @@ async def save_team_name(message: Message, state: FSMContext) -> None:
     await state.set_state(None)
     await message.answer(
         f"✅ Название команды изменено на '{esc(name)}'",
-        reply_markup=author_dashboard(game.code, game.status),
+        reply_markup=author_dashboard(
+            game.code, game.status, game.commanders_closed, game.actors_closed
+        ),
     )
 
 
@@ -103,5 +105,7 @@ async def save_team_count(message: Message, state: FSMContext) -> None:
     await state.set_state(None)
     await message.answer(
         f"✅ Количество участников изменено на {count}",
-        reply_markup=author_dashboard(game.code, game.status),
+        reply_markup=author_dashboard(
+            game.code, game.status, game.commanders_closed, game.actors_closed
+        ),
     )

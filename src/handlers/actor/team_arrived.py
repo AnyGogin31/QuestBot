@@ -23,7 +23,7 @@ from uuid import UUID
 from ...database.models.common import StageStatus, GameStatus
 from ...database.requests.game import get_game_by_code
 from ...database.requests.stage import get_active_stage_for_actor, mark_team_arrived
-from ...keyboards.actor import actor_in_game
+from ...keyboards.actor.actor_active import actor_active
 from ...states import ActorStates
 from ...utils.safe_edit import safe_edit
 
@@ -52,5 +52,5 @@ async def team_arrived(callback: CallbackQuery, state: FSMContext) -> None:
         callback,
         "✅ <b>Команда отмечена как прибывшая</b>\n\n"
         "После взаимодействия нажмите 'Этап завершён'",
-        actor_in_game(),
+        actor_active(),
     )

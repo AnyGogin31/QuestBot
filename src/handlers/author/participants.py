@@ -67,4 +67,8 @@ async def participants(callback: CallbackQuery) -> None:
         )
         text += f"  {label} - {esc(a.name)}{loc}{score_range}\n"
 
-    await safe_edit(callback, text, author_dashboard(code, game.status))
+    await safe_edit(
+        callback,
+        text,
+        author_dashboard(code, game.status, game.commanders_closed, game.actors_closed),
+    )

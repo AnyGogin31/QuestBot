@@ -17,11 +17,10 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def actor_in_game():
+def actor_active():
     builder = InlineKeyboardBuilder()
     builder.button(text="🏁 Команда прибыла", callback_data="actor:team_arrived")
     builder.button(text="✅ Этап завершён", callback_data="actor:stage_complete")
-    builder.button(text="➡️ Готов к следующей команде", callback_data="actor:ready_next")
     builder.button(text="📋 Список команд", callback_data="actor:teams_list")
     builder.adjust(2)
     return builder.as_markup()

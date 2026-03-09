@@ -14,5 +14,11 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-from .actor_confirm_complete import actor_confirm_complete
-from .actor_lobby import actor_lobby
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
+def actor_waiting():
+    builder = InlineKeyboardBuilder()
+    builder.button(text="📋 Список команд", callback_data="actor:teams_list")
+    builder.adjust(1)
+    return builder.as_markup()

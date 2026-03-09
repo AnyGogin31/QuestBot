@@ -25,7 +25,8 @@ from ...database.requests.actor import get_actor_by_id, set_actor_status
 from ...database.requests.game import get_game_by_code
 from ...database.requests.stage import get_active_stage_for_actor
 from ...database.requests.team import get_team_by_id
-from ...keyboards.actor import actor_confirm_complete, actor_in_game
+from ...keyboards.actor import actor_confirm_complete
+from ...keyboards.actor.actor_active import actor_active
 from ...states import ActorStates
 from ...utils.escape import esc
 from ...utils.safe_edit import safe_edit
@@ -79,4 +80,4 @@ async def stage_complete_confirm(callback: CallbackQuery, state: FSMContext) -> 
 
 @router.callback_query(F.data == "actor:cancel_complete", ActorStates.in_game)
 async def stage_complete_cancel(callback: CallbackQuery) -> None:
-    await safe_edit(callback, "↩️ Возврат к этапу.", actor_in_game())
+    await safe_edit(callback, "↩️ Возврат к этапу.", actor_active())

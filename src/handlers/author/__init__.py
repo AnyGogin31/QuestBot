@@ -17,8 +17,12 @@
 from aiogram import Router
 
 from .main_menu import router as main_menu_router
+from .cancel_game import router as cancel_game_router
 from .create_game import router as create_game_router
+from .delete_actor import router as delete_actor_router
+from .delete_team import router as delete_team_router
 from .participants import router as participants_router
+from .registration import router as registration_router
 from .start_game import router as start_game_router
 from .game_status import router as game_status_router
 from .finish_game import router as finish_game_router
@@ -29,8 +33,12 @@ from .edit_actor import router as edit_actor_router
 router = Router()
 router.include_routers(
     main_menu_router,
+    cancel_game_router,
     create_game_router,
+    delete_actor_router,
+    delete_team_router,
     participants_router,
+    registration_router,
     start_game_router,
     game_status_router,
     finish_game_router,
